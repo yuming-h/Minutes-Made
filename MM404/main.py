@@ -1,3 +1,7 @@
+# MM404 - main.py
+# Minutes Made, Copyright 2019
+# Maintainer: Eric Mikulin
+
 import os
 import uuid
 import wave
