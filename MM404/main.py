@@ -7,6 +7,8 @@ import uuid
 import wave
 import math
 import audioop
+import redis
+import json
 from collections import deque
 from flask import Flask, render_template, current_app, session, url_for, render_template
 from flask_socketio import SocketIO, emit
@@ -36,10 +38,12 @@ def start_recording(options):
     session['started'] = False
     session['filenames'] = []
 
+    session['redisdb'] = redis.StrictRedis(host='redis', port=6379, db=0)
+
 
 SILENCE_LIMIT = 1  # Number of seconds of silence before audio phrase has ended
 PREV_AUDIO = 0.75  # Amount of previous audio (in seconds) to prepend to the audio phrase
-THRESHOLD = 3000
+THRESHOLD = 5000
 CHUNK = 1024
 
 def chunks(l, n):
@@ -90,8 +94,15 @@ def write_speech(audio):
     wf.close()
 
     # Emit link to wavfile via websockets
-    emit('add-wavefile', url_for('static', filename='_files/' + filename))
+    audio_chunk_url = url_for('static', filename='_files/' + filename)
+    emit('add-wavefile', audio_chunk_url)
     session['filenames'].append(filename)
+
+    redis_payload = {'auth': session['base_wavename'], 'url': audio_chunk_url}
+
+    # Queue the audio chunk to be processed by REDIS
+    session['redisdb'].lpush('voice-chunk-queue', json.dumps(redis_payload))
+
     return filename
 
 @socketio.on('end-recording')
