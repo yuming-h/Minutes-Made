@@ -28,11 +28,16 @@ var analyserContext = null;
 var canvasWidth, canvasHeight;
 var socketio = io.connect(location.origin, {transports: ['websocket']});
 
-socketio.on('add-wavefile', function(url) {
-    // add new recording to page
-    audio = document.createElement('p');
-    audio.innerHTML = '<audio src="' + url + '" controls>';
-    document.getElementById('wavefiles').appendChild(audio);
+// socketio.on('add-wavefile', function(url) {
+//     // add new recording to page
+//     audio = document.createElement('p');
+//     audio.innerHTML = '<audio src="' + url + '" controls>';
+//     document.getElementById('wavefiles').appendChild(audio);
+// });
+
+socketio.on('new-transcript', function(text) {
+    // Add transcript element to page
+    document.getElementById('wavefiles').innerHTML = '<pre id="transcript">' + text + '</pre>';
 });
 
 function toggleRecording( e ) {
@@ -143,6 +148,7 @@ function gotStream(stream) {
                 output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
             }
             socketio.emit('write-audio', buffer);
+            socketio.emit('get-transcript');
         }
     }
     inputPoint.connect(scriptNode);

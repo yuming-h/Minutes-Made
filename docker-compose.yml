@@ -6,6 +6,7 @@ services:
     hostname: redis
     image: redis:4.0.5-alpine
     command: ["redis-server", "--appendonly", "yes"]
+    restart: always
     ports:
       - "6379:6379"
 
@@ -13,8 +14,8 @@ services:
     container_name: MM404
     hostname: mm404
     command: ["python", "main.py"]
+    restart: always
     tty: true
-    stdin_open: true
     build:
       context: ./MM404
     working_dir: /usr/mm/mm404
@@ -25,4 +26,16 @@ services:
     depends_on:
       - redis
 
-
+  mml:
+    container_name: MML
+    hostname: mml
+    command: ["python", "main.py"]
+    restart: always
+    tty: true
+    build:
+      context: ./MML
+    working_dir: /usr/mm/mml
+    volumes:
+      - ./MML:/usr/mm/mml
+    depends_on:
+      - redis

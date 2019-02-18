@@ -1,2 +1,2 @@
 # MML
-Python machine learning server
+Python machine learning processor
