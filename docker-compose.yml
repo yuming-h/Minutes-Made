@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  redis:
+    container_name: redis
+    hostname: redis
+    image: redis:4.0.5-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+
+  mm404:
+    container_name: MM404
+    hostname: mm404
+    command: ["python", "main.py"]
+    tty: true
+    stdin_open: true
+    build:
+      context: ./MM404
+    working_dir: /usr/mm/mm404
+    volumes:
+      - ./MM404:/usr/mm/mm404
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+
+
