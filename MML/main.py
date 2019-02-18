@@ -54,7 +54,6 @@ def process_from_redis(redisdb):
 
     # Push back to redis
     if transcript:
-        print(transcript)
         redisdb.lpush(chunked_audio_dict['auth'], transcript)
 
 def main():

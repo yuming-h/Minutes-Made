@@ -103,7 +103,6 @@ def write_speech(audio):
     redis_payload = {'auth': session['base_wavename'], 'uri': audio_chunk_url, 'filename': filename}
 
     # Queue the audio chunk to be processed by REDIS
-    print(redis_payload)
     session['redisdb'].lpush(REDIS_Q_KEY, json.dumps(redis_payload))
 
     return filename
