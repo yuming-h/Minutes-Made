@@ -17,6 +17,8 @@ app = Flask(__name__)
 app.config['FILEDIR'] = 'static/_files/'
 socketio = SocketIO(app)
 
+REDIS_Q_KEY = 'voice-chunk-queue'
+
 @app.route('/')
 def index():
     """Return the client application. This frontend is used purely for testing purposes."""
@@ -98,10 +100,10 @@ def write_speech(audio):
     emit('add-wavefile', audio_chunk_url)
     session['filenames'].append(filename)
 
-    redis_payload = {'auth': session['base_wavename'], 'url': audio_chunk_url}
+    redis_payload = {'auth': session['base_wavename'], 'uri': audio_chunk_url, 'filename': filename}
 
     # Queue the audio chunk to be processed by REDIS
-    session['redisdb'].lpush('voice-chunk-queue', json.dumps(redis_payload))
+    session['redisdb'].lpush(REDIS_Q_KEY, json.dumps(redis_payload))
 
     return filename
 
@@ -119,6 +121,14 @@ def end_recording():
     del session['captured_audio']
     del session['started']
     del session['filenames']
+    del session['redisdb']
+
+@socketio.on('get-transcript')
+def get_transcript():
+    # Get the transcript from redis
+    transcript_array_buffer = session['redisdb'].lrange(session['base_wavename'], 0, -1)
+    transcript_array = [x.decode("utf-8") for x in transcript_array_buffer]
+    emit('new-transcript', "\n".join(transcript_array))
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0')
