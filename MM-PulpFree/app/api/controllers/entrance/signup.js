@@ -5,6 +5,7 @@
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
 
+
 module.exports = {
   
   friendlyName: 'Signup',
@@ -18,7 +19,7 @@ module.exports = {
       required: true,
       type: 'string',
       isEmail: true,
-      description: 'The email address for the account'
+      description: 'The email address for the account',
       extendedDescription: 'Must be a valid email address',
     },
 
@@ -30,18 +31,32 @@ module.exports = {
       description: 'The unencrypted password to use for the new account.'
     },
 
-    firstName: {
+    firstname: {
       required: true,
       type: 'string',
       example: 'Steve',
       description: 'The user\'s full name'
     },
 
-    lastName: {
+    lastname: {
       required: true,
       type: 'string',
       example: 'Steve',
       description: 'The user\'s last name'
+    },
+
+    language: {
+      required: true,
+      type: 'string',
+      example: 'en',
+      description: 'ISO-361 language code'
+    },
+
+    country: {
+      required: true,
+      type: 'string',
+      example: 'us',
+      description: 'ISO-3166 alpha-2 country code'
     },
   },
 
@@ -65,7 +80,15 @@ module.exports = {
   },
 
   fn: async (inputs) =>  {
-    
+    User.create({
+      email: lcEmailAddress,
+      pass: await sails.helpers.hashPass(input.password),
+      firstname: inputs.firstname,
+      lastname: inputs.lastname,
+      country: inputs.country,
+      lang: inputs.language
+    })
+    .intercept('E_UNIQUE', 'emailAlreadyInUse')
   }
 };
 
