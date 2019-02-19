@@ -52,7 +52,7 @@ module.exports = {
       required: true,
       description: 'ISO-631 language code',
       example: 'en'
-    }
+    },
 
     //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
     //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
@@ -66,4 +66,4 @@ module.exports = {
   },
 
 };
-  
+

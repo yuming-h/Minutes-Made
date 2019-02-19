@@ -17,21 +17,11 @@ module.exports = {
     }
   },
 
-
-  exits: {
-    success: {
-      description: 'All done.',
-    },
-    hashError: {
-      description: 'There was an error hashing the password',
-    }
-  },
-
-  fn: async function (inputs) {
+  fn: async function (inputs, exits) {
     const saltRounds = 12
-    bcrypt.hash(inputs.password, saltRounds).then((err, hash) => {
+    bcrypt.hash(inputs.password, saltRounds, (err, hash) => {
       if (err) {
-        return exits.hashError(err)
+        return exits.error(err)
       }
       else {
         return exits.success(hash)

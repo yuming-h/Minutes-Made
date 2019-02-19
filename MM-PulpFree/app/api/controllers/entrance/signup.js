@@ -80,15 +80,16 @@ module.exports = {
   },
 
   fn: async (inputs) =>  {
-    User.create({
+    const lcEmailAddress = inputs.emailAddress.toLowerCase()
+    await User.create({
       email: lcEmailAddress,
-      pass: await sails.helpers.hashPass(input.password),
+      pass: await sails.helpers.hashPass(inputs.password),
       firstname: inputs.firstname,
       lastname: inputs.lastname,
       country: inputs.country,
       lang: inputs.language
     })
     .intercept('E_UNIQUE', 'emailAlreadyInUse')
+    .intercept('hashError', 'badRequest');
   }
 };
-
