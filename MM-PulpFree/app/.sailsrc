@@ -6,8 +6,4 @@
     "sails": "1.1.0",
     "sails-generate": "1.16.6"
   }
-  ,
-  "hooks": {
-    "grunt": false
-  }
 }
