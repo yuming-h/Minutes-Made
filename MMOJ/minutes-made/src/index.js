@@ -1,3 +1,7 @@
+// MMOJ - index.js
+// Minutes Made, Copyright 2019
+// Maintainer: Harry Yao
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route } from 'react-router-dom';

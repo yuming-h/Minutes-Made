@@ -1,3 +1,7 @@
+// MMOJ - Register.js
+// Minutes Made, Copyright 2019
+// Maintainer: Harry Yao
+
 import React, { Component } from 'react';
 import axios from 'axios';
 import './Login.css';
