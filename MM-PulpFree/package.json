@@ -1,0 +1,11 @@
+{
+  "name": "pulpfree",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Node backend for Minutes-Made",
+  "dependencies": {
+    "bcrypt": "^3.0.4",
+    "express": "^4.16.4",
+    "pg": "^7.8.1"
+  }
+}
