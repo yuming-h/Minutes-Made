@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 # MM404 - main.py
 # Minutes Made, Copyright 2019
 # Maintainer: Eric Mikulin
@@ -9,15 +12,23 @@ import math
 import audioop
 import redis
 import json
+import numpy as np
 from collections import deque
 from flask import Flask, render_template, current_app, session, url_for, render_template
 from flask_socketio import SocketIO, emit
+from ltsd import LTSD_Detector
 
 app = Flask(__name__)
 app.config['FILEDIR'] = 'static/_files/'
 socketio = SocketIO(app)
 
 REDIS_Q_KEY = 'voice-chunk-queue'
+
+SILENCE_LIMIT = 1.5  # Number of seconds of silence before audio phrase has ended
+PREV_AUDIO = 1  # Amount of previous audio (in seconds) to prepend to the audio phrase
+CHUNK = 2048
+LTSD_CHUNK = int( CHUNK/2 )
+LTSD_ORDER = 5
 
 @app.route('/')
 def index():
@@ -35,18 +46,13 @@ def start_recording(options):
     session['options'] = options
     session['delta'] = options.get('fps', 44100) / CHUNK
     session['prev_audio'] = deque(maxlen=int(PREV_AUDIO * session['delta']))
-    session['slid_win'] = deque(maxlen=int(SILENCE_LIMIT * session['delta']))
+    session['detect_win'] = deque(maxlen=int(SILENCE_LIMIT * session['delta']))
     session['captured_audio'] = []
     session['started'] = False
-    session['filenames'] = []
+
+    session['ltsd'] = LTSD_Detector(LTSD_CHUNK, LTSD_ORDER)
 
     session['redisdb'] = redis.StrictRedis(host='redis', port=6379, db=0)
-
-
-SILENCE_LIMIT = 1  # Number of seconds of silence before audio phrase has ended
-PREV_AUDIO = 0.75  # Amount of previous audio (in seconds) to prepend to the audio phrase
-THRESHOLD = 5000
-CHUNK = 1024
 
 def chunks(l, n):
     """(Generator) Yield successive n-sized chunks from l."""
@@ -57,10 +63,15 @@ def chunks(l, n):
 def detect_audio(data):
     """Voice activity detection of audio chunks from the client."""
     for bchunk in chunks(data, CHUNK):
-        session['slid_win'].append(math.sqrt(abs(audioop.avg(bchunk, 4))))
+        session['detect_win'].append(np.float32(np.fromstring(bchunk, np.int16)))
 
-        # If speech is detected
-        if sum([x > THRESHOLD for x in session['slid_win']]) > 0:
+        # Buffer is not long enough yet
+        if len(session['detect_win']) < session['detect_win'].maxlen:
+            session['ltsd'].compute_noise_spectrum(list(session['detect_win']))  # Assume that the start of the recording is the noise
+            print("Filling buffer")
+
+        # Otherwise if speech is detected
+        elif session['ltsd'].compute_window(list(session['detect_win'])):
             if not session['started']:
                 session['started'] = True
                 print("Speech starts!")
@@ -74,12 +85,12 @@ def detect_audio(data):
 
             # Reset audio detection session variables
             session['started'] = False
-            session['slid_win'] = deque(maxlen=int(SILENCE_LIMIT * session['delta']))
-            session['prev_audio'] = deque(maxlen=int(0.5 * session['delta']))
+            session['prev_audio'].clear()
             session['captured_audio'] = []
 
         # No speech detected and no previous speech detected
         else:
+            session['ltsd'].update_noise_spectrum(list(session['detect_win']))  # Update the noise spectrum
             session['prev_audio'].append(bchunk)
 
 def write_speech(audio):
@@ -98,7 +109,6 @@ def write_speech(audio):
     # Emit link to wavfile via websockets
     audio_chunk_url = url_for('static', filename='_files/' + filename)
     emit('add-wavefile', audio_chunk_url)
-    session['filenames'].append(filename)
 
     redis_payload = {'auth': session['base_wavename'], 'uri': audio_chunk_url, 'filename': filename}
 
@@ -117,10 +127,10 @@ def end_recording():
     del session['delta']
     del session['base_wavename']
     del session['prev_audio']
-    del session['slid_win']
+    del session['detect_win']
     del session['captured_audio']
     del session['started']
-    del session['filenames']
+    del session['ltsd']
     del session['redisdb']
 
 @socketio.on('get-transcript')
