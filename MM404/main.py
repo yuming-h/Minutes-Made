@@ -25,7 +25,7 @@ socketio = SocketIO(app)
 REDIS_Q_KEY = 'voice-chunk-queue'
 
 SILENCE_LIMIT = 1.5  # Number of seconds of silence before audio phrase has ended
-PREV_AUDIO = 0.75  # Amount of previous audio (in seconds) to prepend to the audio phrase
+PREV_AUDIO = 1  # Amount of previous audio (in seconds) to prepend to the audio phrase
 CHUNK = 2048
 LTSD_CHUNK = int( CHUNK/2 )
 LTSD_ORDER = 5
@@ -67,7 +67,7 @@ def detect_audio(data):
 
         # Buffer is not long enough yet
         if len(session['detect_win']) < session['detect_win'].maxlen:
-            session['ltsd'].compute_noise_spectrum(list(session['detect_win']))
+            session['ltsd'].compute_noise_spectrum(list(session['detect_win']))  # Assume that the start of the recording is the noise
             print("Filling buffer")
 
         # Otherwise if speech is detected
@@ -85,13 +85,12 @@ def detect_audio(data):
 
             # Reset audio detection session variables
             session['started'] = False
-            # session['detect_win'].clear()
             session['prev_audio'].clear()
             session['captured_audio'] = []
 
         # No speech detected and no previous speech detected
         else:
-            # session['ltsd'].update_noise_spectrum(list(session['detect_win']))  # Update the noise spectrum to be adaptive
+            session['ltsd'].update_noise_spectrum(list(session['detect_win']))  # Update the noise spectrum
             session['prev_audio'].append(bchunk)
 
 def write_speech(audio):
