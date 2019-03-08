@@ -46,7 +46,7 @@ def start_recording(options):
     session['options'] = options
     session['delta'] = options.get('fps', 44100) / CHUNK
     session['prev_audio'] = deque(maxlen=int(PREV_AUDIO * session['delta']))
-    session['slid_win'] = deque(maxlen=int(SILENCE_LIMIT * session['delta']))
+    session['detect_win'] = deque(maxlen=int(SILENCE_LIMIT * session['delta']))
     session['captured_audio'] = []
     session['started'] = False
 
@@ -63,10 +63,15 @@ def chunks(l, n):
 def detect_audio(data):
     """Voice activity detection of audio chunks from the client."""
     for bchunk in chunks(data, CHUNK):
-        chunk_array = np.float32(np.fromstring(bchunk, np.int16))
+        session['detect_win'].append(np.float32(np.fromstring(bchunk, np.int16)))
 
-        # If speech is detected
-        if session['ltsd'].compute_frame(chunk_array):
+        # Buffer is not long enough yet
+        if len(session['detect_win']) < session['detect_win'].maxlen:
+            session['ltsd'].compute_noise_spectrum(list(session['detect_win']))
+            print("Filling buffer")
+
+        # Otherwise if speech is detected
+        elif session['ltsd'].compute_window(list(session['detect_win'])):
             if not session['started']:
                 session['started'] = True
                 print("Speech starts!")
@@ -80,13 +85,13 @@ def detect_audio(data):
 
             # Reset audio detection session variables
             session['started'] = False
-            session['slid_win'] = deque(maxlen=int(SILENCE_LIMIT * session['delta']))
-            session['prev_audio'] = deque(maxlen=int(0.5 * session['delta']))
+            # session['detect_win'].clear()
+            session['prev_audio'].clear()
             session['captured_audio'] = []
 
         # No speech detected and no previous speech detected
         else:
-            # session['ltsd'].compute_frame(chunk_array)  # Update the noise spectrum to be adaptive
+            # session['ltsd'].update_noise_spectrum(list(session['detect_win']))  # Update the noise spectrum to be adaptive
             session['prev_audio'].append(bchunk)
 
 def write_speech(audio):
@@ -123,7 +128,7 @@ def end_recording():
     del session['delta']
     del session['base_wavename']
     del session['prev_audio']
-    del session['slid_win']
+    del session['detect_win']
     del session['captured_audio']
     del session['started']
     del session['ltsd']

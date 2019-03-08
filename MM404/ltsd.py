@@ -9,11 +9,11 @@ import numpy as np
 import scipy as sp
 
 class LTSD_Detector():
-    def __init__(self, winsize, order, ratio=0.95, e0=50, e1=80, lambda0=30, lambda1=12):
+    def __init__(self, winsize, order, ratio=0.95, e0=100, e1=200, lambda0=15, lambda1=25):
         self.winsize = winsize
         self.window = sp.hanning(winsize)
         self.order = order
-        self.windowidx = -1
+        self.windowidx = order
         self.avgnoise = None
         self.amplitude = {}
 
@@ -23,48 +23,47 @@ class LTSD_Detector():
         self._lambda0 = lambda0
         self._lambda1 = lambda1
 
-    def get_amplitude(self, signal, l):
-        if l in self.amplitude:
-            return self.amplitude[l]
+    def _get_amplitude(self, signal, l, idx):
+        if l+idx in self.amplitude:
+            return self.amplitude[l+idx]
         else:
-            amp = sp.absolute(sp.fft(signal * self.window))
-            self.amplitude[l] = amp
+            amp = sp.absolute(sp.fft(signal[idx] * self.window))
+            self.amplitude[l+idx] = amp
             return amp
 
-    def get_power(self, signal, l):
-        amp = self.get_amplitude(signal, l)
+    def _get_power(self, signal, l, idx):
+        amp = self._get_amplitude(signal, l, idx)
         avgpow = 10*np.log10((np.average(amp) / (10e-7 * 20)) ** 2)
         return avgpow
 
-    def compute_noise_avg_spectrum(self, signal):
+    def _compute_noise_avg_spectrum(self, signal):
         avgamp = np.zeros(self.winsize)
-        avgamp += sp.absolute(sp.fft(signal * self.window))
+        for frame in signal:
+            avgamp += sp.absolute(sp.fft(frame * self.window))
+        return avgamp / len(signal)
 
-        if self.avgnoise is None:
-            self.avgnoise = avgamp**2
-        return (np.sqrt(self.avgnoise) + avgamp) / 2
-
-    def ltse(self, signal, l, order):
+    def _ltse(self, signal, l, order):
         maxamp = np.zeros(self.winsize)
-        for idx in range(l-order, l+order+1):
-            amp = self.get_amplitude(signal, idx)
+        for idx in range(-order, order+1):
+            amp = self._get_amplitude(signal, l, idx)
             maxamp = np.maximum(maxamp, amp)
         return maxamp
 
-    def ltsd(self, signal, l, order):
-        return 10.0*np.log10(np.sum(self.ltse(signal, l, order)**2/self.avgnoise)/len(self.avgnoise))
+    def _ltsd(self, signal, l, order):
+        return 10.0*np.log10(np.sum(self._ltse(signal, l, order)**2/self.avgnoise)/len(self.avgnoise))
 
-    def compute_frame(self, frame):
+    def compute_window(self, signal):
         self.windowidx += 1
-        if self.windowidx < 20:
-            self.avgnoise = self.compute_noise_avg_spectrum(frame)**2
-            return 0  # Evals to false, but not False for debug purposes
-        else:
-            ltsd = self.ltsd(frame, self.windowidx, self.order)
-            power = self.get_power(frame, self.windowidx)
-            return self.is_signal(power, ltsd)
+        numframes = len(signal)
+        ltsds = np.zeros(numframes)
+        for offset in range(numframes):
+            ltsd = self._ltsd(signal, self.windowidx+offset, self.order)
+            power = self._get_power(signal, self.windowidx+offset, self.order)
+            ltsds[offset] = self._is_signal(power, ltsd)
+        return any(ltsds)
 
-    def is_signal(self, energy, ltsd):
+    def _is_signal(self, energy, ltsd):
+        # print(energy, ltsd)
         if energy < self._e0:  # Background noise energy less than cleanest
             if ltsd > self._lambda0:  # LTSD above threshold for cleanest background energy state
                 return True
@@ -78,17 +77,21 @@ class LTSD_Detector():
                 return False
 
         else:  # Background noise energy in between cleanest and noisiest
-            lambdah = ((self._lambda0 - self._lambda1) / (self._e0 - self._e1)) * e +\
+            lambdah = ((self._lambda0 - self._lambda1) / (self._e0 - self._e1)) * energy +\
                 self._lambda0 - (self._lambda0 - self._lambda1) / (1 - self._e1/self._e0)
+            # print(lambdah)
             if ltsd > lambdah:  # LTSD above calculated threshold for background energy state
                 return True
             else:
                 return False
 
-    def update_noise_spectrum(self, signal):
+    def compute_noise_spectrum(self, signal):
+        self.avgnoise = self._compute_noise_avg_spectrum(signal)**2
+
+    def update_noise_spectrum(self, frame):
         avgamp = np.zeros(self.winsize)
-        for idx in range(l - self._order, l + self._order + 1):
-            avgamp += self.get_amplitude(signal, idx)
-        avgamp = avgamp / float(self._order*2 + 1)
+        for idx in range(self.windowidx - self.order, self.windowidx + self.order + 1):
+            avgamp += self._get_amplitude(frame, idx)
+        avgamp = avgamp / float(self.order*2 + 1)
         self.avgnoise = self.avgnoise * self._ratio + (avgamp**2)*(1.0-self._ratio)
 
