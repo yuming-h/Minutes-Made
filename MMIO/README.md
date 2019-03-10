@@ -1,2 +1,2 @@
-# MMIO
-Outward integration service 
+# MMIO (Outbound Integration Service)
+Sends outbound requests to our integrations.
