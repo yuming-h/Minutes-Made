@@ -38,7 +38,7 @@ pipeline {
         stage ('Code Quality') {
             steps {
                 sh 'lizard > Build/reports/lizard/lizard-ccc.txt'
-                sh 'eslint **/*.js --no-eslintrc -o Build/reports/eslint/eslint.html'
+                sh 'eslint **/*.js --no-eslintrc --quiet -f checkstyle -o Build/reports/eslint/eslint.xml'
                 sh 'prettier --check "./**/*.js"'
             }
         }
@@ -49,8 +49,8 @@ pipeline {
         always {
             archiveArtifacts artifacts: 'Build/', fingerprint: true
             
-            junit 'Build/reports/tests/**/*.xml'
-            recordIssues(tools: [esLint(pattern: 'Build/reports/eslint/*')])
+            // junit 'Build/reports/tests/**/*.xml'
+            recordIssues (tools: [esLint(pattern: 'Build/reports/eslint/*')])
         }
 
         success {
