@@ -37,7 +37,8 @@ pipeline {
         // Run code quality tools and analysis
         stage ('Code Quality') {
             steps {
-                sh 'lizard --xml > Build/reports/lizard/code_complexity.xml'
+                sh 'lizard > Build/reports/lizard/lizard-ccc.txt'
+                sh 'eslint **/*.js --no-eslintrc -o Build/reports/eslint/eslint.html'
                 sh 'prettier --check "./**/*.js"'
             }
         }
@@ -47,7 +48,9 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: 'Build/', fingerprint: true
-            junit 'Build/reports/**/*.xml'
+            
+            junit 'Build/reports/tests/**/*.xml'
+            recordIssues(tools: [esLint(pattern: 'Build/reports/eslint/*')])
         }
 
         success {

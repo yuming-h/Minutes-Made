@@ -7,7 +7,7 @@ RUN apt-get update -qq && apt-get install -y npm python3 python3-pip
 RUN pip3 install lizard
 
 # Install node requirments
-RUN npm install --global prettier
+RUN npm install --global prettier eslint
 
 # MinutesMade specific items
 RUN mkdir -p /MinutesMade
