@@ -36,10 +36,10 @@ pipeline {
 
         // Run code quality tools and analysis
         stage ('Code Quality') {
-            steps {
-                sh 'lizard > Build/reports/lizard/lizard-ccc.txt'
-                sh 'eslint **/*.js --no-eslintrc --quiet -f checkstyle -o Build/reports/eslint/eslint.xml'
-                sh 'prettier --check "./**/*.js"'
+            parallel {
+                stage("LizardCCC") { steps { sh 'lizard > Build/reports/lizard/lizard-ccc.txt' }}
+                stage("ESLint") { steps { sh 'eslint **/*.js --no-eslintrc --quiet -f checkstyle -o Build/reports/eslint/eslint.xml' }}
+                stage("Prettier") { steps { sh 'prettier --check "./**/*.js"' }}
             }
         }
     }
