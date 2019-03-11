@@ -38,6 +38,7 @@ pipeline {
         stage ('Code Quality') {
             steps {
                 sh 'lizard --xml > Build/reports/code_complexity.xml'
+                sh 'prettier --check "./**/*.js"'
             }
         }
     }
