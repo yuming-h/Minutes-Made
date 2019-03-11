@@ -1,5 +1,13 @@
 pipeline {
-    agent any;
+    // Use the custom pipeline dockerfile
+    agent {
+        dockerfile {
+            filename 'Dockerfile'
+            dir 'Pipeline'
+            label 'MinutesMade-Pipeline'
+            args '-v ./:/MinutesMade'
+        }
+    }
 
     // These are the build stages
     stages {
@@ -7,25 +15,46 @@ pipeline {
         // Send build started notifications
         stage ('Start') {
             steps {
-                slackSend (color: '#FFFF00', message: "STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+                slackSend (color: 'good', message: "Started ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+                sh 'mkdir -p Build/reports'
             }
         }
 
-        stage ('Test') {
+        // Run tests for each individual service
+        stage ('Test Services') {
             steps {
                 echo "This is a Test"
+            }
+        }
+
+        // Run the integration tests
+        stage ('Test Integration') {
+            steps {
+                echo "This is a test"
+            }
+        }
+
+        // Run code quality tools and analysis
+        stage ('Code Quality') {
+            steps {
+                sh 'lizard --xml > Build/reports/code_complexity.xml'
             }
         }
     }
 
     // Run the steps after the build has finished
     post {
+        always {
+            archiveArtifacts artifacts: 'Build/', fingerprint: true
+            junit 'Build/reports/**/*.xml'
+        }
+
         success {
-            slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slackSend (color: 'good', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} succeed! (<${env.BUILD_URL}|Open>)")
         }
 
         failure {
-            slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slackSend (color: 'bad', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed! (<${env.BUILD_URL}|Open>)")
         }
     }
 }
