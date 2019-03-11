@@ -5,7 +5,6 @@ pipeline {
             filename 'Dockerfile'
             dir 'Pipeline'
             label 'MinutesMade-Pipeline'
-            args '-v ./:/MinutesMade'
         }
     }
 
@@ -17,6 +16,7 @@ pipeline {
             steps {
                 slackSend (color: 'good', message: "Started ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
                 sh 'mkdir -p Build/reports'
+                sh 'mkdir -p Build/reports/lizard'
             }
         }
 
@@ -37,7 +37,7 @@ pipeline {
         // Run code quality tools and analysis
         stage ('Code Quality') {
             steps {
-                sh 'lizard --xml > Build/reports/code_complexity.xml'
+                sh 'lizard --xml > Build/reports/lizard/code_complexity.xml'
                 sh 'prettier --check "./**/*.js"'
             }
         }
