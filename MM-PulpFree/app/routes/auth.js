@@ -1,14 +1,15 @@
-const app = module.exports = require('express')();
+const app = (module.exports = require("express")());
 
-const { signup } = require('../actions').auth
+const { signup } = require("../actions").auth;
 
-app.post('/signup', (req, res) => {
+app.post("/signup", (req, res) => {
   signup(req.body)
-    .then(() => res.send({
-      msg: "User created successfully!"
-    })
+    .then(() =>
+      res.send({
+        msg: "User created successfully!"
+      })
     )
-    .catch((err) => {
-      res.status(400).send(err)
-    })
-})
+    .catch(err => {
+      res.status(400).send(err);
+    });
+});
