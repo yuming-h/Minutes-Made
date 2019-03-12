@@ -1,5 +1,5 @@
-const { hashPass } = require('../utils/hashPass')
-const { pool } = require('../middleware/db')
+const { hashPass } = require("../utils/hashPass");
+const { pool } = require("../middleware/db");
 
 /**
  * Signs a user up.  Will add email confirmation later.
@@ -11,12 +11,12 @@ const { pool } = require('../middleware/db')
  *  firstname: String
  *  lastname: String
  * }
- * @param Object body 
+ * @param Object body
  */
 
 const signup = async (body) => {
   //Get db client from client pool
-  const client = await pool.connect()
+  const client = await pool.connect();
   try {
     const hashedPass = await hashPass(body.pass)
     //Create user
@@ -59,11 +59,9 @@ const login = async (body) => {
     console.log(e)
     throw new Error("Error logging in, please try again")
   } finally {
-    client.release()
+    client.release();
   }
-}
-
-
+};
 
 module.exports = {
   signup,
