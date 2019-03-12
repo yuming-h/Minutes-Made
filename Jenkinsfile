@@ -14,9 +14,8 @@ pipeline {
         // Send build started notifications
         stage ('Start') {
             steps {
-                slackSend (color: 'good', message: "Started ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+                // slackSend (color: 'good', message: "Started ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
                 sh 'mkdir -p Build/reports'
-                sh 'mkdir -p Build/reports/lizard'
             }
         }
 
@@ -37,8 +36,18 @@ pipeline {
         // Run code quality tools and analysis
         stage ('Code Quality') {
             parallel {
-                stage("LizardCCC") { steps { sh 'lizard > Build/reports/lizard/lizard-ccc.txt' }}
-                stage("ESLint") { steps { sh 'eslint **/*.js --no-eslintrc --quiet -f checkstyle -o Build/reports/eslint/eslint.xml' }}
+                stage("LizardCCC") { steps {
+                    sh 'mkdir -p Build/reports/lizard'
+                    sh 'lizard > Build/reports/lizard/lizard-ccc.txt'
+                }}
+                stage("PyLint") { steps { 
+                    sh 'mkdir -p Build/reports/pylint'
+                    sh 'pylint --rcfile=./.pylintrc **/*.py > Build/reports/pylint/pylint.log'
+                }}
+                stage("ESLint") { steps {
+                    sh 'mkdir -p Build/reports/eslint'
+                    sh 'eslint **/*.js --quiet -f checkstyle -o Build/reports/eslint/eslint.xml'
+                }}
                 stage("Prettier") { steps { sh 'prettier --check "./**/*.js"' }}
             }
         }
@@ -50,7 +59,8 @@ pipeline {
             archiveArtifacts artifacts: 'Build/', fingerprint: true
             
             // junit 'Build/reports/tests/**/*.xml'
-            recordIssues (tools: [esLint(pattern: 'Build/reports/eslint/*')])
+            recordIssues (tools: [esLint(pattern: 'Build/reports/eslint/*'),
+                                  pyLint(pattern: 'Build/reports/pylint/*')])
         }
 
         success {
@@ -58,7 +68,8 @@ pipeline {
         }
 
         failure {
-            slackSend (color: 'bad', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed! (<${env.BUILD_URL}|Open>)")
+            // slackSend (color: 'bad', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed! (<${env.BUILD_URL}|Open>)")
+            echo 'bad'
         }
     }
 }
