@@ -8,8 +8,6 @@
 import os
 import uuid
 import wave
-import math
-import audioop
 import redis
 import json
 import numpy as np
@@ -35,9 +33,12 @@ def index():
     """Return the client application. This frontend is used purely for testing purposes."""
     return render_template('index.html')
 
-@socketio.on('start-recording')
-def start_recording(options):
-    """Start recording audio from the client."""
+@socketio.on('start-meeting')
+def start_meeting(options):
+    """Prepares MM404 to begin processing a meeting.
+    - Creates redis links
+    - Creates VAD system
+    """
     print("Recording starts!")
     id = uuid.uuid4().hex  # server-side filename
     session['base_wavename'] = id
@@ -52,7 +53,8 @@ def start_recording(options):
 
     session['ltsd'] = LTSD_Detector(LTSD_CHUNK, LTSD_ORDER)
 
-    session['redisdb'] = redis.StrictRedis(host='redis', port=6379, db=0)
+    session['redis-mml'] = redis.StrictRedis(host='redis-processing', port=6379, db=0)
+    session['redis-sunnyd'] = redis.StrictRedis(host='redis-write', port=6378, db=0)
 
 def chunks(l, n):
     """(Generator) Yield successive n-sized chunks from l."""
@@ -81,7 +83,7 @@ def detect_audio(data):
         elif session['started'] is True:
             print("Speech ends!")
             # The limit was reached, finish capture and deliver.
-            filename = write_speech(list(session['prev_audio']) + session['captured_audio'])
+            filename = write_speech_file(list(session['prev_audio']) + session['captured_audio'])
 
             # Reset audio detection session variables
             session['started'] = False
@@ -93,8 +95,8 @@ def detect_audio(data):
             session['ltsd'].update_noise_spectrum(list(session['detect_win']))  # Update the noise spectrum
             session['prev_audio'].append(bchunk)
 
-def write_speech(audio):
-    """Writes audio data to a wavefile, returns the filename."""
+def write_speech_file(audio):
+    """Writes audio data to a wavefile, enqueues the audio to be processed in redis"""
     filename = session['base_wavename'] + "-" + uuid.uuid4().hex + ".wav"
 
     wf = wave.open(current_app.config['FILEDIR'] + filename, 'wb')
@@ -106,20 +108,21 @@ def write_speech(audio):
     wf.writeframes(byte_stream_audio)
     wf.close()
 
-    # Emit link to wavfile via websockets
+    # Enqueues the speech chunk for processing with MML
     audio_chunk_url = url_for('static', filename='_files/' + filename)
-    emit('add-wavefile', audio_chunk_url)
-
     redis_payload = {'auth': session['base_wavename'], 'uri': audio_chunk_url, 'filename': filename}
 
     # Queue the audio chunk to be processed by REDIS
-    session['redisdb'].lpush(REDIS_Q_KEY, json.dumps(redis_payload))
+    session['redis-mml'].lpush(REDIS_Q_KEY, json.dumps(redis_payload))
 
     return filename
 
-@socketio.on('end-recording')
-def end_recording():
-    """Stop recording audio from the client."""
+@socketio.on('end-meeting')
+def end_meeting():
+    """Cleans up MM404 meeting.
+    - Perform final processing task
+    - Delete session variables
+    """
     print("Recording ends!")
 
     # Tear down the session variables
@@ -131,14 +134,21 @@ def end_recording():
     del session['captured_audio']
     del session['started']
     del session['ltsd']
-    del session['redisdb']
+    del session['redis-mml']
+    del session['redis-sunnyd']
 
-@socketio.on('get-transcript')
-def get_transcript():
+@socketio.on('fetch-transcript')
+def fetch_transcript():
+    """Fetches the updated lines from redis queue.
+    - Routes the transcript lines to db write
+    - Routes the transcript lines to frontend
+    - If action item, POSTs to MMIO
+    """
+
     # Get the transcript from redis
-    transcript_array_buffer = session['redisdb'].lrange(session['base_wavename'], 0, -1)
+    transcript_array_buffer = session['redis-mml'].lrange(session['base_wavename'], 0, -1)
     transcript_array = [x.decode("utf-8") for x in transcript_array_buffer]
-    emit('new-transcript', "\n".join(transcript_array))
+    emit('transcript-updated', "\n".join(transcript_array))
 
-if __name__ == '__main__':
-    socketio.run(app, debug=True, host='0.0.0.0')
+# if __name__ == '__main__':
+#     socketio.run(app, debug=True, host='0.0.0.0')

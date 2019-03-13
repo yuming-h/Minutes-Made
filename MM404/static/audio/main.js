@@ -35,7 +35,7 @@ var socketio = io.connect(location.origin, { transports: ["websocket"] });
 //     document.getElementById('wavefiles').appendChild(audio);
 // });
 
-socketio.on("new-transcript", function(text) {
+socketio.on("transcript-updated", function(text) {
   // Add transcript element to page
   document.getElementById("wavefiles").innerHTML =
     '<pre id="transcript">' + text + "</pre>";
@@ -46,12 +46,12 @@ function toggleRecording(e) {
     // stop recording
     e.classList.remove("recording");
     recording = false;
-    socketio.emit("end-recording");
+    socketio.emit("end-meeting");
   } else {
     // start recording
     e.classList.add("recording");
     recording = true;
-    socketio.emit("start-recording", {
+    socketio.emit("start-meeting", {
       numChannels: 1,
       bps: 16,
       fps: parseInt(audioContext.sampleRate)
@@ -161,7 +161,7 @@ function gotStream(stream) {
         output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
       }
       socketio.emit("write-audio", buffer);
-      socketio.emit("get-transcript");
+      socketio.emit("fetch-transcript");
     }
   };
   inputPoint.connect(scriptNode);

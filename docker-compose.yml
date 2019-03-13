@@ -1,20 +1,38 @@
 version: '3'
 
 services:
-  redis:
-    container_name: redis
-    hostname: redis
+  nginx:
+    container_name: NGINX
+    image: mm-nginx
+    build:
+      context: ./Nginx
+    volumes:
+      - ./MM404:/usr/mm/mm404
+    ports:
+      - "80:80"
+    depends_on:
+      - mm404
+
+  redis-processing:
+    container_name: redis-processing
+    hostname: redis-processing
     image: redis:4.0.5-alpine
-    command: ["redis-server", "--appendonly", "yes"]
-    # restart: always
+    command: ["redis-server", "--appendonly", "yes", "--port", "6379"]
     ports:
       - "6379:6379"
+
+  redis-write:
+    container_name: redis-write
+    hostname: redis-write
+    image: redis:4.0.5-alpine
+    command: ["redis-server", "--appendonly", "yes", "--port", "6378"]
+    ports:
+      - "6378:6378"
 
   mm404:
     container_name: MM404
     hostname: mm404
-    command: ["python", "main.py"]
-    # restart: always
+    command: ["gunicorn", "-k", "eventlet", "-w", "1", "main:app", "--bind=0.0.0.0:5000", "--no-sendfile"]
     tty: true
     build:
       context: ./MM404
@@ -24,13 +42,13 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - redis
+      - redis-write
+      - redis-processing
 
   mml:
     container_name: MML
     hostname: mml
     command: ["python", "main.py"]
-    # restart: always
     tty: true
     build:
       context: ./MML
@@ -38,4 +56,4 @@ services:
     volumes:
       - ./MML:/usr/mm/mml
     depends_on:
-      - redis
+      - redis-processing

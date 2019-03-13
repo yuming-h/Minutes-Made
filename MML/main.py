@@ -57,7 +57,7 @@ def process_from_redis(redisdb):
         redisdb.lpush(chunked_audio_dict['auth'], transcript)
 
 def main():
-    redisdb = redis.StrictRedis(host='redis', port=6379, db=0)
+    redisdb = redis.StrictRedis(host='redis-processing', port=6379, db=0)
     os.makedirs(MEDIA_DIR, exist_ok=True)
 
     while True:

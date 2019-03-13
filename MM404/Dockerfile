@@ -1,7 +1,7 @@
 FROM python:3.6
 
-RUN apt-get update -y && apt-get install -y portaudio19-dev
-RUN pip install pyaudio flask python-socketio flask_socketio eventlet redis numpy scipy
+RUN apt-get update -y && apt-get install -y gunicorn
+RUN pip install gunicorn[eventlet] flask python-socketio flask_socketio redis numpy scipy
 
 ENV FLASK_APP main.py
 
