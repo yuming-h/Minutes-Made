@@ -35,10 +35,15 @@ var socketio = io.connect(location.origin, { transports: ["websocket"] });
 //     document.getElementById('wavefiles').appendChild(audio);
 // });
 
-socketio.on("new-transcript", function(text) {
+socketio.on("transcript-updated", function(text) {
   // Add transcript element to page
-  document.getElementById("wavefiles").innerHTML =
-    '<pre id="transcript">' + text + "</pre>";
+  var transcript = JSON.parse(text);
+
+  if (transcript.length > 0) {
+    transcript_element = document.createElement("pre");
+    transcript_element.innerHTML = JSON.stringify(transcript);
+    document.getElementById("wavefiles").appendChild(transcript_element);
+  }
 });
 
 function toggleRecording(e) {
@@ -161,7 +166,7 @@ function gotStream(stream) {
         output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
       }
       socketio.emit("write-audio", buffer);
-      socketio.emit("get-transcript");
+      socketio.emit("fetch-transcript");
     }
   };
   inputPoint.connect(scriptNode);

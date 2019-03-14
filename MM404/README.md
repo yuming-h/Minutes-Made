@@ -3,11 +3,63 @@ Meeting session process
 
 ## Setup
 ```
-sudo docker build . -t mm404
+sudo docker-compose build
 ```
 
 ## Running
 ```
-sudo docker run -it -v $(pwd):/usr/mm/mm404 -p 5000:5000 mm404 python main.py
+sudo docker-compose up
 ```
-Then navigate to http://127.0.0.1:5000/ to test
+Then navigate to http://127.0.0.1 to test
+
+## MML Job JSON Syntax:
+Audio processing job:
+```
+{
+  "job_type": "audio",
+  "job_data": {
+    "meeting_id": "thisisameetingidstring",
+    "speaker_hints": null,
+    "audio_uri": "http://mm404/static/files/something.wav",
+    "filename": "something.wav"
+  }
+}
+```
+
+Transcript line JSON syntax: *(This syntax will be used for the SunnyD DB write also)*
+```
+{
+  "meeting_id": "thisisameetingidstring",
+  "line_number": 3,
+  "speaker_name": "Eric Mikulin",
+  "speaker_id": "speakeruuidstring",
+  "timestamp": "4:55:63 09-30-2019",
+  "line_text": "I spoke this line and I meant it"
+  "action_item": <action item object>
+}
+```
+
+Meeting Post processing job:
+```
+{
+  "job_type": "postmeeting",
+  "job_data": {
+    "meeting_id": "thisisameetingidstring",
+    "transcript": <transcript JSON object>
+  }
+}
+```
+
+Post Processing return syntax: *(This syntax will be used for the SunnyD DB write also)*
+```
+{
+  "meeting_id": "thisisameetingidstring",
+  "timestamp": "4:55:63 09-30-2019",
+  "tags": [
+      "hello",
+      "tech",
+      "code",
+      "algorithms"
+    ]
+}
+```
