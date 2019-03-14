@@ -33,7 +33,7 @@ Transcript line JSON syntax: *(This syntax will be used for the SunnyD DB write 
   "line_number": 3,
   "speaker_name": "Eric Mikulin",
   "speaker_id": "speakeruuidstring",
-  "timestamp": "4:55:63 09-30-2019",
+  "timestamp": "103910293",
   "line_text": "I spoke this line and I meant it"
   "action_item": <action item object>
 }
@@ -54,7 +54,7 @@ Post Processing return syntax: *(This syntax will be used for the SunnyD DB writ
 ```
 {
   "meeting_id": "thisisameetingidstring",
-  "timestamp": "4:55:63 09-30-2019",
+  "timestamp": "120203019",
   "tags": [
       "hello",
       "tech",
