@@ -32,7 +32,7 @@ services:
   mm404:
     container_name: MM404
     hostname: mm404
-    command: ["gunicorn", "-k", "eventlet", "-w", "1", "main:app", "--bind=0.0.0.0:5000", "--no-sendfile"]
+    command: ["gunicorn", "-k", "eventlet", "-w", "1", "main_mm404:app", "--bind=0.0.0.0:5000", "--no-sendfile"]
     tty: true
     build:
       context: ./MM404
@@ -48,7 +48,7 @@ services:
   mml:
     container_name: MML
     hostname: mml
-    command: ["python", "main.py"]
+    command: ["python", "main_mml.py"]
     tty: true
     build:
       context: ./MML

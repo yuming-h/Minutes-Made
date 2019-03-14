@@ -37,8 +37,13 @@ var socketio = io.connect(location.origin, { transports: ["websocket"] });
 
 socketio.on("transcript-updated", function(text) {
   // Add transcript element to page
-  document.getElementById("wavefiles").innerHTML =
-    '<pre id="transcript">' + text + "</pre>";
+  var transcript = JSON.parse(text);
+
+  if (transcript.length > 0) {
+    transcript_element = document.createElement("pre");
+    transcript_element.innerHTML = JSON.stringify(transcript);
+    document.getElementById("wavefiles").appendChild(transcript_element);
+  }
 });
 
 function toggleRecording(e) {

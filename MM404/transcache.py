@@ -14,11 +14,18 @@ class TransCacheReader():
         self.redis = redis
         self.meeting_id = meeting_id
 
-        self.missing_lines = set()
-        self.missing_idx = 0
         self.latest_idx = 0
 
     def read_new_lines(self):
-        transcript_array_buffer = self.redis.lrange(self.meeting_id, 0, -1)
-        transcript_array = [json.loads(x.decode("utf-8")) for x in transcript_array_buffer]
-        return(transcript_array)
+        """Reads lines from the redis cache that haven't been read before"""
+        # Get the "end" of the transcript
+        transcript_len = self.redis.llen(self.meeting_id)
+
+        # Get the newest transcript lines from the redis cache
+        transcript_bytes_array = self.redis.lrange(self.meeting_id, self.latest_idx, transcript_len-1)
+        transcript_array = [json.loads(line.decode("utf-8")) for line in transcript_bytes_array]
+
+        # Update the index with the new length
+        self.latest_idx = transcript_len
+
+        return transcript_array

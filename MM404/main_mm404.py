@@ -31,7 +31,7 @@ LTSD_CHUNK = int( CHUNK/2 )
 LTSD_ORDER = 5
 
 #### Other Constants
-FETCH_INTERVAL = 0.5
+FETCH_INTERVAL = 0.1
 REDIS_JOB_QUEUE_KEY = 'job-queue'
 REDIS_WRITE_QUEUE_KEY = 'write-queue'
 
@@ -64,8 +64,19 @@ def start_meeting():
     meeting_id = uuid.uuid4().hex  # TODO: This is temporary until PulpFree spawing is configured, this currently breaks multiple gunicorn workers :(
 
     # Spawn sync thread
+    eventlet.monkey_patch()  # Patch modules to be non-blocking (Looking at you REDIS!)
     eventlet.spawn(transcript_sync_worker)
     print("Ready to start meeting!")
+
+@socketio.on('connect')
+def on_connect():
+    """Handles when a user connects to the websocket"""
+    session['transcript_reader'] = TransCacheReader(meeting_id, redis_processing)
+
+@socketio.on('disconnect')
+def on_disconnect():
+    """Handles when a user disconnects from the websocket"""
+    del session['transcript_reader']
 
 @socketio.on('start-recording')
 def start_recording(options):
@@ -82,7 +93,6 @@ def start_recording(options):
     session['captured_audio'] = []
     session['started'] = False
     session['ltsd'] = LTSD_Detector(LTSD_CHUNK, LTSD_ORDER)
-    session['transcript_reader'] = TransCacheReader(meeting_id, redis_processing)
 
 def chunks(l, n):
     """(Generator) Yield successive n-sized chunks from l."""
@@ -197,7 +207,6 @@ def end_recording():
     del session['captured_audio']
     del session['started']
     del session['ltsd']
-    del session['transcript_reader']
 
 #### Meeting init
 start_meeting()  # Run this function at app startup

@@ -2,6 +2,7 @@
 # Minutes Made, Copyright 2019
 # Maintainer: Eric Mikulin
 
+import time
 import redis
 import requests
 import json
@@ -11,6 +12,7 @@ import speech_recognition as sr
 
 REDIS_JOB_QUEUE_KEY = 'job-queue'
 MEDIA_DIR = "media/"
+FETCH_INTERVAL = 0.1
 
 def translate_to_text(audio_fn):
     """Test function needs to be replaced"""
@@ -35,6 +37,7 @@ def process_from_redis(redisdb):
     # Pop the data from the queue
     audio_processing_job = redisdb.rpop(REDIS_JOB_QUEUE_KEY)
     if not audio_processing_job:
+        time.sleep(FETCH_INTERVAL)
         return
 
     # Extract key information from the redis item
@@ -63,7 +66,7 @@ def process_from_redis(redisdb):
 
     # Push back to redis
     if transcript_line:
-        redisdb.lpush(audio_processing_job['job_data']['meeting_id'], json.dumps(redis_payload))
+        redisdb.rpush(audio_processing_job['job_data']['meeting_id'], json.dumps(redis_payload))
 
 def main():
     redisdb = redis.StrictRedis(host='redis-processing', port=6379, db=0)
