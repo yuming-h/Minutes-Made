@@ -5,30 +5,20 @@
 # Minutes Made, Copyright 2019
 # Maintainer: Eric Mikulin
 
+import json
+
 class TransCacheReader():
     """Acts a per session reader of the cache."""
 
-    def __init__(self):
+    def __init__(self, meeting_id, redis):
+        self.redis = redis
+        self.meeting_id = meeting_id
+
         self.missing_lines = set()
-        self.pointer = 0
+        self.missing_idx = 0
+        self.latest_idx = 0
 
-    def read_new_lines(self, transcache):
-        pass
-
-    def read_full_transcript(self, transcache):
-        pass
-
-class TransCache():
-    """Acts as a local cache for the transcript."""
-
-    def __init__(self):
-        self.transcript = {}  # Line Number : Line as Dict
-
-    def read_line_range(self, line_number_range):
-        pass
-
-    def read_line(self, line_number):
-        pass
-
-    def add_line(self, line_dict):
-        pass
+    def read_new_lines(self):
+        transcript_array_buffer = self.redis.lrange(self.meeting_id, 0, -1)
+        transcript_array = [json.loads(x.decode("utf-8")) for x in transcript_array_buffer]
+        return(transcript_array)

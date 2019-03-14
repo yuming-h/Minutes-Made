@@ -9,7 +9,7 @@ import os
 
 import speech_recognition as sr
 
-REDIS_Q_KEY = 'voice-chunk-queue'
+REDIS_JOB_QUEUE_KEY = 'job-queue'
 MEDIA_DIR = "media/"
 
 def translate_to_text(audio_fn):
@@ -33,14 +33,14 @@ def translate_to_text(audio_fn):
 def process_from_redis(redisdb):
     """Pops an audio ML job off of the queue and processes it"""
     # Pop the data from the queue
-    chunked_audio_json = redisdb.rpop(REDIS_Q_KEY)
-    if not chunked_audio_json:
+    audio_processing_job = redisdb.rpop(REDIS_JOB_QUEUE_KEY)
+    if not audio_processing_job:
         return
 
     # Extract key information from the redis item
-    chunked_audio_dict = json.loads(chunked_audio_json)
-    local_fn = MEDIA_DIR + chunked_audio_dict['filename']
-    mm404_url = "http://mm404:5000" + chunked_audio_dict['uri']
+    audio_processing_job = json.loads(audio_processing_job)
+    local_fn = MEDIA_DIR + audio_processing_job['job_data']['filename']
+    mm404_url = "http://mm404:5000" + audio_processing_job['job_data']['audio_uri']
 
     # Download the .wav file from the server
     with requests.get(mm404_url, stream=True) as req:
@@ -50,11 +50,20 @@ def process_from_redis(redisdb):
                     fil.write(chunk)
 
     # Do the speech recognition
-    transcript = translate_to_text(local_fn)
+    transcript_line = translate_to_text(local_fn)
+    redis_payload = {
+        "meeting_id": audio_processing_job['job_data']['meeting_id'],
+        "line_number": 3,
+        "speaker_name": "Eric Mikulin",
+        "speaker_id": "speakeruuidstring",
+        "timestamp": "7192731273097129",
+        "line_text": transcript_line,
+        "action_item": None
+    }
 
     # Push back to redis
-    if transcript:
-        redisdb.lpush(chunked_audio_dict['auth'], transcript)
+    if transcript_line:
+        redisdb.lpush(audio_processing_job['job_data']['meeting_id'], json.dumps(redis_payload))
 
 def main():
     redisdb = redis.StrictRedis(host='redis-processing', port=6379, db=0)
