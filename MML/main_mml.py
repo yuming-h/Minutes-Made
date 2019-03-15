@@ -53,13 +53,14 @@ def process_from_redis(redisdb):
                     fil.write(chunk)
 
     # Do the speech recognition
+    epoch_seconds = round(time.time())
     transcript_line = translate_to_text(local_fn)
     redis_payload = {
         "meeting_id": audio_processing_job['job_data']['meeting_id'],
         "line_number": 3,
         "speaker_name": "Eric Mikulin",
         "speaker_id": "speakeruuidstring",
-        "timestamp": "7192731273097129",
+        "timestamp": epoch_seconds,
         "line_text": transcript_line,
         "action_item": None
     }
