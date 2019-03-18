@@ -57,3 +57,16 @@ services:
       - ./MML:/usr/mm/mml
     depends_on:
       - redis-processing
+
+  mmkoolaid:
+    container_name: MM-Koolaid
+    hostname: mmkoolaid
+    command: ["gunicorn", "-k", "eventlet", "-w", "1", "main_mmkoolaid:app", "--bind=0.0.0.0:5050", "--no-sendfile"]
+    tty: true
+    build:
+      context: ./MM-Koolaid
+    working_dir: /usr/mm/mm-koolaid
+    volumes:
+      - ./MM-Koolaid:/usr/mm/mm-koolaid
+    ports:
+      - "5050:5050"
