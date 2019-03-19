@@ -1,4 +1,4 @@
-const env = process.env.NODE_ENV || "local"
+const env = process.env.NODE_ENV || "local";
 
 const local = {
   app: {
@@ -11,8 +11,9 @@ const local = {
     password: "oZqs94JrzUTwc5l5hcA5",
     port: 5432
   },
-  tokenSecret: "thisIsJustATestForLocalDon-tActuallyUseHardCodedKeyLikeThis10203ButIt'sPrettyLongSoMightBeOkHeHeXd"
-}
+  tokenSecret:
+    "thisIsJustATestForLocalDon-tActuallyUseHardCodedKeyLikeThis10203ButIt'sPrettyLongSoMightBeOkHeHeXd"
+};
 
 const dev = {
   app: {
@@ -25,8 +26,9 @@ const dev = {
     password: "oZqs94JrzUTwc5l5hcA5",
     port: 5432
   },
-  tokenSecret: "thisIsJustATestForLocalDon-tActuallyUseHardCodedKeyLikeThis10203ButIt'sPrettyLongSoMightBeOkHeHeXd"
-}
+  tokenSecret:
+    "thisIsJustATestForLocalDon-tActuallyUseHardCodedKeyLikeThis10203ButIt'sPrettyLongSoMightBeOkHeHeXd"
+};
 
 const production = {
   app: {
@@ -41,12 +43,12 @@ const production = {
     port: 5432
   },
   tokenSecret: process.env.JWT_SECRET_PROD
-}
+};
 
 const config = {
   local,
   dev,
   production
-}
+};
 
-module.exports = config[env]
+module.exports = config[env];

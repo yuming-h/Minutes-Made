@@ -1,6 +1,6 @@
 const app = (module.exports = require("express")());
 
-const { signup, login } = require('../actions').auth
+const { signup, login } = require("../actions").auth;
 
 app.post("/signup", (req, res) => {
   signup(req.body)
@@ -9,18 +9,20 @@ app.post("/signup", (req, res) => {
         msg: "User created successfully!"
       })
     )
-    .catch((err) => {
-      res.status(500).send(err.message)
-    })
-})
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
+});
 
 //Authenticates the login credentials and returns a jwt that the client should save in local storage
-app.post('/login', (req, res) => {
+app.post("/login", (req, res) => {
   login(req.body)
-    .then(jwt => res.send({
-      jwt
-    }))
-    .catch((err) => {
-      res.status(500).send(err.message)
-    })
-})
+    .then(jwt =>
+      res.send({
+        jwt
+      })
+    )
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
+});
