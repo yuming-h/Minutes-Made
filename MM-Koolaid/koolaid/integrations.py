@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# MM-KoolAid - koolaid/integrations/integrations.py
+# MM-KoolAid - koolaid/integrations.py
 # Minutes Made, Copyright 2019
 # Maintainer: Eric Mikulin
 
@@ -15,7 +15,7 @@ async def integrations_availible(meeting_id):
     availible = ['slack', 'jira']
     return jsonify(availible)
 
-@blueprint.route('/integrations/authkeys/<service>/<meeting_id>', methods=['GET'])
+@blueprint.route('/integrations/authkeys/<service>/<int:meeting_id>', methods=['GET'])
 async def integrations_auth(service, meeting_id):
     """Returns a JSON object with the auth tokens for a given integration."""
     auth_keys = {service: {"token": "test_token", "secret": "shhhh"} }
