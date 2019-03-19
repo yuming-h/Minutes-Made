@@ -14,7 +14,7 @@ pipeline {
         // Send build started notifications
         stage ('Start') {
             steps {
-                slackSend (color: 'good', message: "Started ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
+                // slackSend (color: 'good', message: "Started ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
                 sh 'mkdir -p Build/reports'
             }
         }
@@ -64,7 +64,8 @@ pipeline {
         }
 
         success {
-            slackSend (color: 'good', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} succeed! (<${env.BUILD_URL}|Open>)")
+            // slackSend (color: 'good', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} succeed! (<${env.BUILD_URL}|Open>)")
+            echo 'YAY!'
         }
 
         failure {
