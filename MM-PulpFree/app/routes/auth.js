@@ -10,7 +10,7 @@ app.post("/signup", (req, res) => {
       })
     )
     .catch((err) => {
-      res.status(500).send(err)
+      res.status(500).send(err.message)
     })
 })
 
@@ -21,6 +21,6 @@ app.post('/login', (req, res) => {
       jwt
     }))
     .catch((err) => {
-      res.status(500).send(err)
+      res.status(500).send(err.message)
     })
 })
