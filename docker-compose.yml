@@ -61,7 +61,7 @@ services:
   mmkoolaid:
     container_name: MM-Koolaid
     hostname: mmkoolaid
-    command: ["gunicorn", "-k", "eventlet", "-w", "1", "main_mmkoolaid:app", "--bind=0.0.0.0:5050", "--no-sendfile"]
+    command: ["hypercorn", "--config", "python:hypercorn.py", "main_mmkoolaid:create_app()"]
     tty: true
     build:
       context: ./MM-Koolaid

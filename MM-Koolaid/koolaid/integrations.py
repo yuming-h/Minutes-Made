@@ -1,14 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# MM-KoolAid - koolaid/integrations.py
+# MM-KoolAid - koolaid/integrations/integrations.py
 # Minutes Made, Copyright 2019
 # Maintainer: Eric Mikulin
 
-def availible(db, meeting_id):
-    """Returns a JSON list of availible integrations given a meeting id."""
-    return meeting_id
+from quart import abort, Blueprint, current_app, jsonify, request
 
-def auth(db, service, meeting_id):
+blueprint = Blueprint('integrations', __name__)
+
+@blueprint.route('/integrations/available/<int:meeting_id>', methods=['GET'])
+async def integrations_availible(meeting_id):
+    """Returns a JSON list of availible integrations given a meeting id."""
+    availible = ['slack', 'jira']
+    return jsonify(availible)
+
+@blueprint.route('/integrations/authkeys/<service>/<meeting_id>', methods=['GET'])
+async def integrations_auth(service, meeting_id):
     """Returns a JSON object with the auth tokens for a given integration."""
-    return "{}{}".format(service, meeting_id)
+    auth_keys = {service: {"token": "test_token", "secret": "shhhh"} }
+    return jsonify(auth_keys)
