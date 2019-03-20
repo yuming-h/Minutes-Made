@@ -4,7 +4,7 @@ const { signup, login } = require("../actions").auth;
 
 app.post("/signup", (req, res) => {
   signup(req.body)
-    .then(() =>
+    .then((success, reject) =>
       res.send({
         msg: "User created successfully!"
       })

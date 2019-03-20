@@ -6,6 +6,6 @@ app.use(express.json());
 
 app.use(routes);
 
-app.listen(8080, "localhost", () => {
-  console.log(`App running at http://localhost:8080`);
+app.listen(8080, "0.0.0.0", () => {
+  console.log(`App running at http://0.0.0.0:8080`);
 });

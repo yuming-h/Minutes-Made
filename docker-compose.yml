@@ -29,6 +29,19 @@ services:
     ports:
       - "6378:6378"
 
+  mmpulpfree:
+    container_name: MM-PulpFree
+    hostname: mmpulpfree
+    command: ["node", "server"]
+    tty: true
+    build:
+      context: ./MM-PulpFree
+    working_dir: /usr/mm/mm-pulpfree/app
+    volumes:
+      - ./MM-PulpFree/app:/usr/mm/mm-pulpfree/app
+    ports:
+      - "8080:8080"
+
   mm404:
     container_name: MM404
     hostname: mm404

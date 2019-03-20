@@ -16,14 +16,17 @@ async def users_create():
     data = await request.get_json()
     user_data = data['user']
 
-    async with current_app.pool.acquire() as connection:
-        uid = await connection.fetchval(
-            """INSERT INTO users(email, password, country, language, firstname, lastname, lastlogin)
-               VALUES ($1, $2, $3, $4, $5, $6, $7)
-               RETURNING userid""",
-               *user_data
-            )
-    return jsonify({"id": uid})
+    try:
+        async with current_app.pool.acquire() as connection:
+            uid = await connection.fetchval(
+                """INSERT INTO users(email, password, country, language, firstname, lastname, lastlogin)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7)
+                   RETURNING userid""",
+                   *user_data
+                )
+        return jsonify({"id": uid})
+    except:
+        abort(400)
 
 
 @blueprint.route('/users/password', methods=['GET'])
