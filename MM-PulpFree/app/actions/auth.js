@@ -3,7 +3,7 @@ const { pool } = require("../middleware/db");
 const conf = require("../config/config");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-const axios = require('axios');
+const axios = require("axios");
 
 /**
  * Signs a user up.  Will add email confirmation later.
@@ -19,30 +19,31 @@ const axios = require('axios');
  */
 const signup = async body => {
   // Create the user data
-  const hashedPass = await hashPass(body.pass);
-  const d = new Date();
-  const epochSeconds = Math.round(d.getTime() / 1000);
-  const dbArr = [
-    body.email,
-    hashedPass,
-    body.country,
-    body.lang,
-    body.firstname,
-    body.lastname,
-    epochSeconds
-  ];
+  try {
+    const hashedPass = await hashPass(body.pass);
+    const d = new Date();
+    const epochSeconds = Math.round(d.getTime() / 1000);
+    const dbArr = [
+      body.email,
+      hashedPass,
+      body.country,
+      body.lang,
+      body.firstname,
+      body.lastname,
+      epochSeconds
+    ];
 
-  // Make the write request to the db writer service
-  axios.post('http://mmkoolaid:5050/users/create', {user: dbArr})
-    .then(response => {
-      console.log(response.data.url);
-      console.log(response.data.explanation);
-      return response, null;
-    })
-    .catch(error => {
-      console.log(error);
-      throw new Error("Error creating account, please try again.");
+    // Make the write request to the db writer service
+    const res = await axios.post("http://0.0.0.0:5050/users/create", {
+      user: dbArr
     });
+    console.log(res.data.url);
+    console.log(res.data.explanation);
+    return res;
+  } catch (e) {
+    console.log(e);
+    throw new Error("Error creating account, please try again.");
+  }
 };
 
 /**
