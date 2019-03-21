@@ -24,12 +24,12 @@ async def users_create():
                    RETURNING userid""",
                    *user_data
                 )
-        return jsonify({"id": uid})
+        return jsonify({"userId": uid})
     except:
         abort(400)
 
 
-@blueprint.route('/users/password', methods=['GET'])
+@blueprint.route('/users/password', methods=['POST'])
 async def users_password():
     """Gets the hashed password given user email."""
     data = await request.get_json()
@@ -45,7 +45,7 @@ async def users_password():
     if passwd_data is not None:
         return jsonify({'password': passwd_data['password'],
                         'email': passwd_data['email'],
-                        'userid': passwd_data['userid']})
+                        'userId': passwd_data['userid']})
     else:
         abort(404)
 
