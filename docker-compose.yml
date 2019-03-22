@@ -3,7 +3,7 @@ version: '3'
 services:
   nginx:
     container_name: NGINX
-    image: mm-nginx
+    image: www.minutesmade.com:8091/mm-nginx
     build:
       context: ./Nginx
     volumes:
@@ -45,6 +45,7 @@ services:
   mm404:
     container_name: MM404
     hostname: mm404
+    image: www.minutesmade.com:8091/mm404
     command: ["gunicorn", "-k", "eventlet", "-w", "1", "main_mm404:app", "--bind=0.0.0.0:5000", "--no-sendfile"]
     tty: true
     build:
@@ -61,6 +62,7 @@ services:
   mml:
     container_name: MML
     hostname: mml
+    image: www.minutesmade.com:8091/mml
     command: ["python", "main_mml.py"]
     tty: true
     build:

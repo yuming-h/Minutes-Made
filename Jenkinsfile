@@ -5,6 +5,7 @@ pipeline {
             filename 'Dockerfile'
             dir 'Pipeline'
             label 'MinutesMade-Pipeline'
+            args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
 
@@ -16,6 +17,13 @@ pipeline {
             steps {
                 // slackSend (color: 'good', message: "Started ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)")
                 sh 'mkdir -p Build/reports'
+            }
+        }
+
+        // Build the docker images for potential deployment
+        stage ('Build Docker Images') {
+            steps {
+                sh 'docker-compose build'
             }
         }
 
@@ -40,7 +48,7 @@ pipeline {
                     sh 'mkdir -p Build/reports/lizard'
                     sh 'lizard > Build/reports/lizard/lizard-ccc.txt'
                 }}
-                stage("PyLint") { steps { 
+                stage("PyLint") { steps {
                     sh 'mkdir -p Build/reports/pylint'
                     sh 'pylint --rcfile=./.pylintrc **/*.py > Build/reports/pylint/pylint.log || exit 0'
                 }}
@@ -51,13 +59,26 @@ pipeline {
                 stage("Prettier") { steps { sh 'prettier --check "./**/*.js"' }}
             }
         }
+
+        // Push the docker images to the local registry
+        stage ('Push Docker Images') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sh 'docker-compose push'
+            }
+        }
     }
 
     // Run the steps after the build has finished
     post {
         always {
+            // Permissions fix
+            sh 'chown -R jenkins:jenkins ./'
+
             archiveArtifacts artifacts: 'Build/', fingerprint: true
-            
+
             // junit 'Build/reports/tests/**/*.xml'
             recordIssues (tools: [esLint(pattern: 'Build/reports/eslint/*'),
                                   pyLint(pattern: 'Build/reports/pylint/*')])
@@ -69,6 +90,7 @@ pipeline {
         }
 
         failure {
+            echo 'Sad :('
             slackSend (color: 'bad', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed! (<${env.BUILD_URL}|Open>)")
         }
     }
