@@ -153,7 +153,6 @@ reset = async () => {
     ]
   );
 
-
   await db.query(
     `INSERT INTO "users" (firstname, lastname, email, password, country, registerdate, lastlogin)
       VALUES($1, $2, $3, $4, $5, $6, $7)`,
@@ -171,55 +170,32 @@ reset = async () => {
   await db.query(
     `INSERT INTO "org" (orgname, address, city, country, zipcode)
       VALUES($1, $2, $3, $4, $5)`,
-    [
-      "Minutes Made",
-      "1102-5782 Berton Ave",
-      "Vancouver",
-      "ca",
-      "V6S0C1"
-    ]
+    ["Minutes Made", "1102-5782 Berton Ave", "Vancouver", "ca", "V6S0C1"]
   );
 
   await db.query(
     `INSERT INTO "user_in_org" (userid, orgid, joindate)
       VALUES($1, $2, $3)`,
-    [
-      1,
-      1,
-      epochSeconds
-    ]
+    [1, 1, epochSeconds]
   );
 
   await db.query(
     `INSERT INTO "user_in_org" (userid, orgid, joindate)
       VALUES($1, $2, $3)`,
-    [
-      2,
-      1,
-      epochSeconds
-    ]
+    [2, 1, epochSeconds]
   );
 
   await db.query(
     `INSERT INTO "user_in_org" (userid, orgid, joindate)
       VALUES($1, $2, $3)`,
-    [
-      3,
-      1,
-      epochSeconds
-    ]
+    [3, 1, epochSeconds]
   );
 
   await db.query(
     `INSERT INTO "user_in_org" (userid, orgid, joindate)
       VALUES($1, $2, $3)`,
-    [
-      4,
-      1,
-      epochSeconds
-    ]
+    [4, 1, epochSeconds]
   );
-
 };
 
 reset()
