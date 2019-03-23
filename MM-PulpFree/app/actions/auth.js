@@ -30,10 +30,11 @@ const signup = async body => {
       body.lang,
       body.firstname,
       body.lastname,
+      epochSeconds,
       epochSeconds
     ];
     const res = await client.query(
-      "INSERT INTO users(email, pass, country, lang, firstname, lastname, lastlogin) VALUES($1, $2, $3, $4, $5, $6, $7)",
+      "INSERT INTO users(email, pass, country, lang, firstname, lastname, registerdate, lastlogin) VALUES($1, $2, $3, $4, $5, $6, $7)",
       dbArr
     );
     return JSON.stringify(res);

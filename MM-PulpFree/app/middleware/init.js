@@ -38,6 +38,7 @@ reset = async () => {
       password      CHAR(60) NOT NULL,
       country       CHAR(2),
       language      CHAR(2),
+      registerdate    BIGINT,
       lastlogin     BIGINT,
       
       PRIMARY KEY (userid)
@@ -47,9 +48,10 @@ reset = async () => {
     (
       orgid        SERIAL,
       orgname      VARCHAR(45),
-      address       VARCHAR(45),
+      address       VARCHAR(100),
+      city          VARCHAR(100),
+      country       CHAR(2),
       zipcode       VARCHAR(10),
-      country       VARCHAR(45),
 
       PRIMARY KEY (orgid)
     );`);
@@ -61,7 +63,7 @@ reset = async () => {
     joindate      BIGINT,
 
     PRIMARY KEY (userid, orgid),
-    FOREIGN KEY (userid) REFERENCES "user"(userid)
+    FOREIGN KEY (userid) REFERENCES "users"(userid)
       ON DELETE CASCADE,
     FOREIGN KEY (orgid) REFERENCES "org"(orgid)
       ON DELETE CASCADE
@@ -74,7 +76,7 @@ reset = async () => {
       joindate    BIGINT,
 
       PRIMARY KEY (userid, orgid),
-      FOREIGN KEY (userid) REFERENCES "user"(userid)
+      FOREIGN KEY (userid) REFERENCES "users"(userid)
         ON DELETE CASCADE,
       FOREIGN KEY (orgid) REFERENCES "org"(orgid)
         ON DELETE CASCADE
@@ -97,7 +99,7 @@ reset = async () => {
       orgid INT,
 
       PRIMARY KEY (userid, meetingid, orgid),
-      FOREIGN KEY (userid) REFERENCES "user"(userid)
+      FOREIGN KEY (userid) REFERENCES "users"(userid)
         ON DELETE CASCADE,
       FOREIGN KEY (orgid) REFERENCES "org"(orgid)
         ON DELETE SET NULL
@@ -108,23 +110,121 @@ reset = async () => {
    */
   const d = new Date();
   const epochSeconds = Math.round(d.getTime() / 1000);
+
   await db.query(
-    `INSERT INTO "user" (firstname, lastname, email, password, country, lastlogin)
-      VALUES($1, $2, $3, $4, $5, $6)`,
+    `INSERT INTO "users" (firstname, lastname, email, password, country, registerdate, lastlogin)
+      VALUES($1, $2, $3, $4, $5, $6, $7)`,
     [
       "YuMing",
       "He",
       "yumingh7@gmail.com",
       "$2y$12$YYWw9Auq9gppEiotER4iBenjV.dXbY1Tr8Ol.JcRdw9BESSKH2zUa",
       "ca",
+      epochSeconds,
       epochSeconds
     ]
   );
+
+  await db.query(
+    `INSERT INTO "users" (firstname, lastname, email, password, country, registerdate, lastlogin)
+      VALUES($1, $2, $3, $4, $5, $6, $7)`,
+    [
+      "Justin",
+      "Derwee-Church",
+      "firepower789@gmail.com",
+      "$2y$12$YYWw9Auq9gppEiotER4iBenjV.dXbY1Tr8Ol.JcRdw9BESSKH2zUa",
+      "ca",
+      epochSeconds,
+      epochSeconds
+    ]
+  );
+
+  await db.query(
+    `INSERT INTO "users" (firstname, lastname, email, password, country, registerdate, lastlogin)
+      VALUES($1, $2, $3, $4, $5, $6, $7)`,
+    [
+      "Eric",
+      "Mikulin",
+      "ericm99@gmail.com",
+      "$2y$12$YYWw9Auq9gppEiotER4iBenjV.dXbY1Tr8Ol.JcRdw9BESSKH2zUa",
+      "ca",
+      epochSeconds,
+      epochSeconds
+    ]
+  );
+
+
+  await db.query(
+    `INSERT INTO "users" (firstname, lastname, email, password, country, registerdate, lastlogin)
+      VALUES($1, $2, $3, $4, $5, $6, $7)`,
+    [
+      "Harry",
+      "Yao",
+      "harryyao13@gmail.com",
+      "$2y$12$YYWw9Auq9gppEiotER4iBenjV.dXbY1Tr8Ol.JcRdw9BESSKH2zUa",
+      "ca",
+      epochSeconds,
+      epochSeconds
+    ]
+  );
+
+  await db.query(
+    `INSERT INTO "org" (orgname, address, city, country, zipcode)
+      VALUES($1, $2, $3, $4, $5)`,
+    [
+      "Minutes Made",
+      "1102-5782 Berton Ave",
+      "Vancouver",
+      "ca",
+      "V6S0C1"
+    ]
+  );
+
+  await db.query(
+    `INSERT INTO "user_in_org" (userid, orgid, joindate)
+      VALUES($1, $2, $3)`,
+    [
+      1,
+      1,
+      epochSeconds
+    ]
+  );
+
+  await db.query(
+    `INSERT INTO "user_in_org" (userid, orgid, joindate)
+      VALUES($1, $2, $3)`,
+    [
+      2,
+      1,
+      epochSeconds
+    ]
+  );
+
+  await db.query(
+    `INSERT INTO "user_in_org" (userid, orgid, joindate)
+      VALUES($1, $2, $3)`,
+    [
+      3,
+      1,
+      epochSeconds
+    ]
+  );
+
+  await db.query(
+    `INSERT INTO "user_in_org" (userid, orgid, joindate)
+      VALUES($1, $2, $3)`,
+    [
+      4,
+      1,
+      epochSeconds
+    ]
+  );
+
 };
 
 reset()
   .then(() => {
-    console.log("Database was reset.");
+    console.log("Database was successfully reset.");
   })
   .catch(e => {
     console.log("Something went wrong: " + e);
