@@ -63,7 +63,7 @@ pipeline {
         // Push the docker images to the local registry
         stage ('Push Docker Images') {
             when {
-                branch '26-docker-reg'
+                branch 'master'
             }
             steps {
                 sh 'docker-compose push'
