@@ -30,6 +30,7 @@ const signup = async body => {
       body.lang,
       body.firstname,
       body.lastname,
+      epochSeconds,
       epochSeconds
     ];
 
