@@ -29,6 +29,19 @@ services:
     ports:
       - "6378:6378"
 
+  mmpulpfree:
+    container_name: MM-PulpFree
+    hostname: mmpulpfree
+    command: ["node", "server"]
+    tty: true
+    build:
+      context: ./MM-PulpFree
+    working_dir: /usr/mm/mm-pulpfree/app
+    volumes:
+      - ./MM-PulpFree/app:/usr/mm/mm-pulpfree/app
+    ports:
+      - "8080:8080"
+
   mm404:
     container_name: MM404
     hostname: mm404
@@ -57,3 +70,16 @@ services:
       - ./MML:/usr/mm/mml
     depends_on:
       - redis-processing
+
+  mmkoolaid:
+    container_name: MM-Koolaid
+    hostname: mmkoolaid
+    command: ["hypercorn", "--config", "python:hypercorn.py", "main_mmkoolaid:create_app()"]
+    tty: true
+    build:
+      context: ./MM-Koolaid
+    working_dir: /usr/mm/mm-koolaid
+    volumes:
+      - ./MM-Koolaid:/usr/mm/mm-koolaid
+    ports:
+      - "5050:5050"
