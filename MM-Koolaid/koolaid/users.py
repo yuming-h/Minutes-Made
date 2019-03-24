@@ -12,7 +12,7 @@ blueprint = Blueprint('users', __name__)
 
 @blueprint.route('/users/create', methods=['POST'])
 async def users_create():
-    """Creates a user in the postgreas database."""
+    """Creates a user in the postgres database."""
     data = await request.get_json()
     user_data = data['user']
 
