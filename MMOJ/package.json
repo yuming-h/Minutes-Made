@@ -1,0 +1,21 @@
+{
+  "name": "mmoj",
+  "version": "1.0.0",
+  "description": "Frontend for Minutes Made.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "next": "^8.0.3",
+    "react": "^16.8.5",
+    "react-dom": "^16.8.5",
+    "redux": "^4.0.1",
+    "semantic-ui-react": "^0.86.0"
+  }
+}

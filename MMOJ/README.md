@@ -1,2 +1,2 @@
 # MMOJ
-React Frontend
+Minutes Made frontend.
