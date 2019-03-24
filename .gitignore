@@ -413,5 +413,8 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Should've used vim
+*.idea
+
 # End of https://www.gitignore.io/api/node,linux,flask,django,python,windows,sublimetext,visualstudiocode
 
