@@ -1,6 +1,18 @@
 version: '3'
 
 services:
+  nginx:
+    container_name: NGINX
+    image: docker.minutesmade.com/mm-nginx
+    build:
+      context: ./Nginx
+    volumes:
+      - ./MM404:/usr/mm/mm404
+    ports:
+      - "80:80"
+    depends_on:
+      - mm404
+
   redis-processing:
     container_name: redis-processing
     hostname: redis-processing
