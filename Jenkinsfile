@@ -77,10 +77,19 @@ pipeline {
         // Deploy our integration build to the dev machine
         stage ('Deploy integration') {
             when {
-                branch 'master'
+                branch '26-docker-reg'
             }
             steps {
-                sh 'docker-compose push'
+                sshagent(['eric_devmachine_ssh']) {
+                    sh '''
+                        ssh -o StrictHostKeyChecking=no -l ericm 173.183.117.166 -p 2022
+                        cd /home/ericm/MinutesMade/Deploy/Minutes-Made
+                        git fetch
+                        git reset --hard origin/master
+                        docker-compose down
+                        docker-compose start
+                    '''
+                }
             }
         }
 
