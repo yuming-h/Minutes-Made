@@ -63,18 +63,33 @@ pipeline {
         // Push the docker images to the local registry
         stage ('Push Docker Images') {
             when {
+                branch '26-docker-reg'
+            }
+            environment {
+                DOCKER_AUTH = credentials('mm_docker_registry_auth')
+            }
+            steps {
+                sh 'echo "$DOCKER_AUTH_PSW" | docker login docker.minutesmade.com -u "$DOCKER_AUTH_USR" --password-stdin'
+                sh 'docker-compose push'
+            }
+        }
+
+        // Deploy our integration build to the dev machine
+        stage ('Deploy integration') {
+            when {
                 branch 'master'
             }
             steps {
                 sh 'docker-compose push'
             }
         }
+
     }
 
     // Run the steps after the build has finished
     post {
         always {
-            // Permissions fix
+            // Permissions fix / workaround
             sh 'chown -R jenkins:jenkins ./'
 
             archiveArtifacts artifacts: 'Build/', fingerprint: true

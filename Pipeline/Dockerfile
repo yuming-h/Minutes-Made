@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 # Install apt-get requirements
-RUN apt-get update -qq && apt-get install -y docker-compose npm python3 python3-pip
+RUN apt-get update -qq && apt-get install -y gnupg2 pass docker-compose npm python3 python3-pip
 
 # Install python3 requirements
 RUN pip3 install lizard pylint
