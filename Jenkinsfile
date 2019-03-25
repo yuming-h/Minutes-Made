@@ -56,7 +56,7 @@ pipeline {
         // Perform Docker Build and Deployment Operations on MASTER
         stage ('Docker Build and Deployment') {
             when {
-                branch '26-docker-reg'
+                branch 'master'
             }
             stages {
                  // Build the docker images for potential deployment
@@ -117,7 +117,7 @@ pipeline {
 
         failure {
             echo 'Sad :('
-            // slackSend (color: 'bad', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed! (<${env.BUILD_URL}|Open>)")
+            slackSend (color: 'bad', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed! (<${env.BUILD_URL}|Open>)")
         }
     }
 }
