@@ -20,13 +20,6 @@ pipeline {
             }
         }
 
-        // Build the docker images for potential deployment
-        stage ('Build Docker Images') {
-            steps {
-                sh 'docker-compose build'
-            }
-        }
-
         // Run tests for each individual service
         stage ('Test Services') {
             steps {
@@ -60,40 +53,48 @@ pipeline {
             }
         }
 
-        // Push the docker images to the local registry
-        stage ('Push Docker Images') {
+        // Perform Docker Build and Deployment Operations on MASTER
+        stage ('Docker Build and Deployment') {
             when {
                 branch '26-docker-reg'
             }
-            environment {
-                DOCKER_AUTH = credentials('mm_docker_registry_auth')
-            }
-            steps {
-                sh 'echo "$DOCKER_AUTH_PSW" | docker login docker.minutesmade.com -u "$DOCKER_AUTH_USR" --password-stdin'
-                sh 'docker-compose push'
-            }
-        }
+            stages {
+                 // Build the docker images for potential deployment
+                stage ('Build Docker Images') {
+                    steps {
+                        sh 'docker-compose build'
+                    }
+                }
 
-        // Deploy our integration build to the dev machine
-        stage ('Deploy integration') {
-            when {
-                branch '26-docker-reg'
-            }
-            steps {
-                sshagent(['eric_devmachine_ssh']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no -l ericm -p 2022 173.183.117.166 -t " \
-                            cd /home/ericm/MinutesMade/Deploy/Minutes-Made && \
-                            git fetch && \
-                            git reset --hard origin/master && \
-                            docker-compose down && \
-                            docker-compose up -d
-                            "
-                    '''
+                // Push the docker images to the local registry
+                stage ('Push Docker Images') {
+                    environment {
+                        DOCKER_AUTH = credentials('mm_docker_registry_auth')
+                    }
+                    steps {
+                        sh 'echo "$DOCKER_AUTH_PSW" | docker login docker.minutesmade.com -u "$DOCKER_AUTH_USR" --password-stdin'
+                        sh 'docker-compose push'
+                    }
+                }
+
+                // Deploy our integration build to the dev machine
+                stage ('Deploy to DEV Integration') {
+                    steps {
+                        sshagent(['eric_devmachine_ssh']) {
+                            sh '''
+                                ssh -o StrictHostKeyChecking=no -l ericm -p 2022 173.183.117.166 -t " \
+                                    cd /home/ericm/MinutesMade/Deploy/Minutes-Made && \
+                                    docker-compose down && \
+                                    git fetch && \
+                                    git reset --hard origin/master && \
+                                    docker-compose up -d
+                                    "
+                            '''
+                        }
+                    }
                 }
             }
         }
-
     }
 
     // Run the steps after the build has finished
@@ -116,7 +117,7 @@ pipeline {
 
         failure {
             echo 'Sad :('
-            slackSend (color: 'bad', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed! (<${env.BUILD_URL}|Open>)")
+            // slackSend (color: 'bad', message: "${env.JOB_NAME} #${env.BUILD_NUMBER} failed! (<${env.BUILD_URL}|Open>)")
         }
     }
 }
