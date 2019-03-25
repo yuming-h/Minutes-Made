@@ -82,12 +82,13 @@ pipeline {
             steps {
                 sshagent(['eric_devmachine_ssh']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no -l ericm 173.183.117.166 -p 2022
-                        cd /home/ericm/MinutesMade/Deploy/Minutes-Made
-                        git fetch
-                        git reset --hard origin/master
-                        docker-compose down
-                        docker-compose start
+                        ssh -o StrictHostKeyChecking=no -l ericm -p 2022 173.183.117.166 -t " \
+                            cd /home/ericm/MinutesMade/Deploy/Minutes-Made && \
+                            git fetch && \
+                            git reset --hard origin/master && \
+                            docker-compose down && \
+                            docker-compose up -d
+                            "
                     '''
                 }
             }

@@ -9,7 +9,7 @@ services:
     volumes:
       - ./MM404:/usr/mm/mm404
     ports:
-      - "80:80"
+      - "8089:80"
     depends_on:
       - mm404
 
