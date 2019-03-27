@@ -1,7 +1,4 @@
-const { hashPass } = require("../utils/hashPass");
 const conf = require("../config/config");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 const axios = require("axios");
 
 /**
@@ -9,7 +6,7 @@ const axios = require("axios");
  * @param Int meetingId
  */
 function GetContainerInfo(meetingId) {
-  const meetingManagerDomain = "http://mm404manager:5000";
+  const meetingManagerDomain = conf.meetingManagerDomain;
   const containerHostName = "mm-meeting-" + meetingInfo.meetingId;
   const containerUrl = meetingManagerDomain + "/" + containerHostName;
 
