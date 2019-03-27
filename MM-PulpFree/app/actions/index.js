@@ -1,5 +1,5 @@
 const { signup, login } = require("./auth");
-const { create, connect, end } = require("./meeting");
+const { schedule, start, connect, finish, end } = require("./meeting");
 
 module.exports = {
   auth: {
@@ -7,8 +7,10 @@ module.exports = {
     login
   },
   meeting: {
-    create,
+    schedule,
+    start,
     connect,
+    finish,
     end
   }
 };

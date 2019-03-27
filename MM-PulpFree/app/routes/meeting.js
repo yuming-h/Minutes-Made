@@ -1,13 +1,27 @@
 const app = (module.exports = require("express")());
 
-const { create, connect, end } = require("../actions").meeting;
+const { schedule, start, connect, finish, end } = require("../actions").meeting;
 
-// Spawns a Minutes Made meeting
-app.post("/create", (req, res) => {
-  create(req.body)
+// Creates a Minutes Made meeting
+app.post("/schedule", (req, res) => {
+  schedule(req.body)
     .then(meeting =>
       res.send({
         msg: "Meeting created successfully!",
+        meeting: meeting
+      })
+    )
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
+});
+
+// Starts a Minutes Made meeting
+app.post("/schedule", (req, res) => {
+  schedule(req.body)
+    .then(meeting =>
+      res.send({
+        msg: "Meeting started successfully!",
         meeting: meeting
       })
     )
@@ -21,7 +35,7 @@ app.post("/connect", (req, res) => {
   connect(req.body)
     .then(meeting =>
       res.send({
-        meeting_url: meeting.url
+        meetingUrl: meeting.meetingUrl
       })
     )
     .catch(err => {
@@ -30,6 +44,19 @@ app.post("/connect", (req, res) => {
 });
 
 // Sends the shutdown signal to the meeting
+app.post("/finish", (req, res) => {
+  finish(req.body)
+    .then(() =>
+      res.send({
+        msg: "Meeting finished succcessfully"
+      })
+    )
+    .catch(err => {
+      res.status(500).send(err.message);
+    });
+});
+
+// Deletes the 404 container for a meeting
 app.post("/end", (req, res) => {
   end(req.body)
     .then(() =>
