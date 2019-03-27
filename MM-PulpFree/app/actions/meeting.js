@@ -30,7 +30,7 @@ function GetContainerInfo(meetingId) {
 const schedule = async body => {
   try {
     // Make the request to write to the db writer server
-    const res = await axios.post("http://mmkoolaid:5050/meetings/create", {
+    const res = await axios.post(conf.koolaidDomain + "/meetings/create", {
       scheduled_meeting_start: body.scheduledMeetingStart,
       scheduled_meeting_end: body.scheduledMeetingEnd,
       host_id: body.host,
@@ -59,7 +59,7 @@ const schedule = async body => {
     const containerId = createRes.data.Id;
 
     // Write the containerId into the database
-    await axios.post("http://mmkoolaid:5050/meetings/containerid", {
+    await axios.post(conf.koolaidDomain + "/meetings/containerid", {
       meetingId: meetingInfo.meetingId,
       containerId: containerId
     });
@@ -87,7 +87,7 @@ const start = async body => {
     const containerInfo = GetContainerInfo(body.meetingId);
 
     // Get the container id from the database
-    const res = await axios.get("http://mmkoolaid:5050/meetings/containerid", {
+    const res = await axios.get(conf.koolaidDomain + "/meetings/containerid", {
       meetingId: body.meetingId
     });
     const containerId = res.data.containerId;
@@ -101,7 +101,7 @@ const start = async body => {
     );
 
     // Set the meeting as active
-    await axios.put("http://mmkoolaid:5050/meetings/active", {
+    await axios.put(conf.koolaidDomain + "/meetings/active", {
       meetingId: body.meetingId,
       active: true
     });
@@ -161,7 +161,7 @@ const finish = async body => {
     );
 
     // Set the meeting as inactive
-    await axios.put("http://mmkoolaid:5050/meetings/active", {
+    await axios.put(conf.koolaidDomain + "/meetings/active", {
       meetingId: body.meetingId,
       active: false
     });
@@ -187,7 +187,7 @@ const end = async body => {
     const containerInfo = GetContainerInfo(body.meetingId);
 
     // Check that the meeting has been sent the shutdown signal first
-    const activeRes = await axios.get("http://mmkoolaid:5050/meetings/active", {
+    const activeRes = await axios.get(conf.koolaidDomain + "/meetings/active", {
       meetingId: body.meetingId
     });
     if (activeRes.data.active === true) {
@@ -197,7 +197,7 @@ const end = async body => {
     }
 
     // Get the container id from the database
-    const res = await axios.get("http://mmkoolaid:5050/meetings/containerid", {
+    const res = await axios.get(conf.koolaidDomain + "/meetings/containerid", {
       meetingId: body.meetingId
     });
     const containerId = res.data.containerId;
