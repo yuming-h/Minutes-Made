@@ -25,17 +25,19 @@ function GetContainerInfo(meetingId) {
  * body: {
  *  scheduledMeetingStart: UTC Epoch Timestamp,
  *  scheduledMeetingEnd: UTC Epoch Timestamp,
- *  host: user_in_org_id
+ *  host: user_id,
+ *  org: org_id
  * }
  * @param Object body
  */
 const schedule = async body => {
   try {
     // Make the request to write to the db writer server
-    const res = await axios.post("http://mmkoolaid:5050/meeting/create", {
+    const res = await axios.post("http://mmkoolaid:5050/meetings/create", {
       scheduled_meeting_start: body.scheduledMeetingStart,
       scheduled_meeting_end: body.scheduledMeetingEnd,
-      host_id: body.host
+      host_id: body.host,
+      org_id: body.org
     });
 
     // Get the meeting information back from the db writer service
@@ -57,10 +59,12 @@ const schedule = async body => {
       containerInfo.meetingManagerDomain + "/containers/create ",
       dockerEnginePayload
     );
+    const containerId = createRes.data.Id;
 
     // Write the containerId into the database
-    const res = await axios.post("http://mmkoolaid:5050/meeting/containerid", {
-      meetingId: meetingInfo.meetingId
+    await axios.post("http://mmkoolaid:5050/meetings/containerid", {
+      meetingId: meetingInfo.meetingId,
+      containerId: containerId
     });
 
     // Return the meeting information
@@ -86,18 +90,24 @@ const start = async body => {
     const containerInfo = GetContainerInfo(body.meetingId);
 
     // Get the container id from the database
-    const res = await axios.get("http://mmkoolaid:5050/meeting/containerid", {
+    const res = await axios.get("http://mmkoolaid:5050/meetings/containerid", {
       meetingId: body.meetingId
     });
     const containerId = res.data.containerId;
 
     // Start the 404 Container
-    const startRes = await axios.post(
+    await axios.post(
       containerInfo.meetingManagerDomain +
         "/containers/" +
         containerId +
         "/start"
     );
+
+    // Set the meeting as active
+    await axios.put("http://mmkoolaid:5050/meetings/active", {
+      meetingId: body.meetingId,
+      active: true
+    });
 
     // Return the meeting information
     console.log(
@@ -148,10 +158,16 @@ const finish = async body => {
   try {
     const containerInfo = GetContainerInfo(body.meetingId);
 
-    // Start the 404 Container
+    // Send the finish meeting signal
     const finishres = await axios.post(
       containerInfo.containerUrl + "/finish-meeting"
     );
+
+    // Set the meeting as inactive
+    await axios.put("http://mmkoolaid:5050/meetings/active", {
+      meetingId: body.meetingId,
+      active: false
+    });
 
     // Return the meeting information
     console.log("Sent finish meeting signal to " + containerInfo.containerUrl);
@@ -173,14 +189,24 @@ const end = async body => {
   try {
     const containerInfo = GetContainerInfo(body.meetingId);
 
+    // Check that the meeting has been sent the shutdown signal first
+    const activeRes = await axios.get("http://mmkoolaid:5050/meetings/active", {
+      meetingId: body.meetingId
+    });
+    if (activeRes.data.active === true) {
+      throw new Error(
+        "Cannot delete meeting in progress, please finish the meeting first."
+      );
+    }
+
     // Get the container id from the database
-    const res = await axios.get("http://mmkoolaid:5050/meeting/containerid", {
+    const res = await axios.get("http://mmkoolaid:5050/meetings/containerid", {
       meetingId: body.meetingId
     });
     const containerId = res.data.containerId;
 
     // Delete the 404 Container
-    const endRes = await axios.delete(
+    await axios.delete(
       containerInfo.meetingManagerDomain + "/containers/" + containerId
     );
 
