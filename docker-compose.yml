@@ -47,7 +47,6 @@ services:
     container_name: MM404
     hostname: mm404
     image: docker.minutesmade.com/mm404
-    command: ["gunicorn", "-k", "eventlet", "-w", "1", "main_mm404:app", "--bind=0.0.0.0:5000", "--no-sendfile"]
     tty: true
     build:
       context: ./MM404

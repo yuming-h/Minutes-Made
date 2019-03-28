@@ -7,3 +7,4 @@ RUN mkdir -p /usr/mm/mm404
 WORKDIR /usr/mm/mm404
 
 EXPOSE 5000
+CMD ["gunicorn", "-k", "eventlet", "-w", "1", "main_mm404:app", "--bind=0.0.0.0:5000", "--no-sendfile"]

@@ -17,8 +17,8 @@ app.post("/schedule", (req, res) => {
 });
 
 // Starts a Minutes Made meeting
-app.post("/schedule", (req, res) => {
-  schedule(req.body)
+app.post("/start", (req, res) => {
+  start(req.body)
     .then(meeting =>
       res.send({
         msg: "Meeting started successfully!",
@@ -31,7 +31,7 @@ app.post("/schedule", (req, res) => {
 });
 
 // Returns the URL of an existing meeting
-app.post("/connect", (req, res) => {
+app.get("/connect", (req, res) => {
   connect(req.body)
     .then(meeting =>
       res.send({

@@ -15,12 +15,12 @@ async def meetings_create():
     """Creates a meeting in the postgres database."""
     data = await request.get_json()
     meeting_data = (
-        data['scheduledMeetingStart'],
-        data['scheduledendtime'],
+        data['scheduled_meeting_start'],
+        data['scheduled_meeting_end'],
     )
     user_in_org_data = (
-        data['host_id']
-        data['org_id']
+        data['host_id'],
+        data['org_id'],
     )
 
     try:
@@ -34,12 +34,13 @@ async def meetings_create():
                 )
             await connection.execute(
                 """INSERT INTO user_in_org_in_meeting(userid, orgid, meetingid)
-                   VALUES ($1, $2)
+                   VALUES ($1, $2, $3)
                    RETURNING meetingid""",
                    *user_in_org_data, meeting_id
                 )
         return jsonify({"meetingId": meeting_id})
-    except:
+    except Exception as e:
+        print(e)
         abort(400)
 
 
@@ -79,12 +80,13 @@ async def meetings_containerid():
                 return jsonify({'containerId': container_data['containerid'],})
             else:
                 abort(404)
-    except:
+    except Exception as e:
+        print(e)
         abort(400)
 
 
 @blueprint.route('/meetings/active', methods=['GET', 'PUT'])
-async def meetings_containerid():
+async def meetings_active():
     """Gets or updates the 'active' flag for a meeting from the database."""
     data = await request.get_json()
 
@@ -119,5 +121,6 @@ async def meetings_containerid():
                 return jsonify({'active': meeting_data['active'],})
             else:
                 abort(404)
-    except:
+    except Exception as e:
+        print(e)
         abort(400)

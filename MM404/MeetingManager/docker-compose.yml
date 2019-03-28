@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  nginx404manager:
+    container_name: NGINX404MANAGER
+    image: docker.minutesmade.com/mm-nginx-404-manager
+    build:
+      context: ./
+    ports:
+      - "5001:80"
+    networks:
+      - 404_net
+
+networks:
+  404_net:
+    driver: bridge

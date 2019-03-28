@@ -90,7 +90,7 @@ reset = async () => {
       scheduledendtime    BIGINT,
       starttime           BIGINT,
       endtime             BIGINT,
-      active              BOOLEAN,
+      active              BOOLEAN DEFAULT false,
       containerid         VARCHAR(256),
 
       PRIMARY KEY (meetingid)
