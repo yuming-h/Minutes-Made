@@ -124,3 +124,85 @@ async def meetings_active():
     except Exception as e:
         print(e)
         abort(400)
+
+
+@blueprint.route('/meetings/starttime', methods=['GET', 'PUT'])
+async def meetings_starttime():
+    """Gets or updates the starttime of a meeting from the database."""
+    data = await request.get_json()
+
+    try:
+        # PUT: Update the meeting starttime
+        if request.method == 'PUT':
+            meeting_id = data['meetingId']
+            start_time = data['starttime']
+
+            async with current_app.pool.acquire() as connection:
+                await connection.execute(
+                    """UPDATE meeting
+                        SET starttime = $1
+                        WHERE meetingid = $2""",
+                        start_time,
+                        meeting_id
+                    )
+            return jsonify({"success": True})
+
+        # GET: Update the meeting active flag
+        else:
+            meeting_id = data['meetingId']
+
+            async with current_app.pool.acquire() as connection:
+                starttime_data = await connection.fetchrow(
+                    """SELECT starttime
+                        FROM meeting
+                        WHERE meetingid = $1""",
+                        meeting_id
+                    )
+            if starttime_data is not None:
+                return jsonify({'starttime': starttime_data['starttime'],})
+            else:
+                abort(404)
+    except Exception as e:
+        print(e)
+        abort(400)
+
+
+@blueprint.route('/meetings/endtime', methods=['GET', 'PUT'])
+async def meetings_endtime():
+    """Gets or updates the endtime of a meeting from the database."""
+    data = await request.get_json()
+
+    try:
+        # PUT: Update the meeting endtime
+        if request.method == 'PUT':
+            meeting_id = data['meetingId']
+            end_time = data['endtime']
+
+            async with current_app.pool.acquire() as connection:
+                await connection.execute(
+                    """UPDATE meeting
+                        SET endtime = $1
+                        WHERE meetingid = $2""",
+                        end_time,
+                        meeting_id
+                    )
+            return jsonify({"success": True})
+
+        # GET: Update the meeting active flag
+        else:
+            meeting_id = data['meetingId']
+
+            async with current_app.pool.acquire() as connection:
+                endtime_data = await connection.fetchrow(
+                    """SELECT endtime
+                        FROM meeting
+                        WHERE meetingid = $1""",
+                        meeting_id
+                    )
+            if endtime_data is not None:
+                return jsonify({'endtime': starttime_data['endtime'],})
+            else:
+                abort(404)
+    except Exception as e:
+        print(e)
+        abort(400)

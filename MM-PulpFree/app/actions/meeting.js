@@ -110,6 +110,14 @@ const start = async body => {
       active: true
     });
 
+    // Set the start time of the meeting
+    const d = new Date();
+    const epochSeconds = Math.round(d.getTime() / 1000);
+    await axios.put(conf.koolaidDomain + "/meetings/starttime", {
+      meetingId: body.meetingId,
+      starttime: epochSeconds
+    });
+
     // Return the meeting information
     console.log(
       "Meeting " +
@@ -168,6 +176,14 @@ const finish = async body => {
     await axios.put(conf.koolaidDomain + "/meetings/active", {
       meetingId: body.meetingId,
       active: false
+    });
+
+    // Set the end time of the meeting
+    const d = new Date();
+    const epochSeconds = Math.round(d.getTime() / 1000);
+    await axios.put(conf.koolaidDomain + "/meetings/endtime", {
+      meetingId: body.meetingId,
+      endtime: epochSeconds
     });
 
     // Return the meeting information
