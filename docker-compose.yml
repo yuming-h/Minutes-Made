@@ -1,3 +1,4 @@
+##### DEV #####
 version: '3'
 
 services:
@@ -32,11 +33,11 @@ services:
   mmpulpfree:
     container_name: MM-PulpFree
     hostname: mmpulpfree
-    image: docker.minutesmade.com/mmpulpfree
-    command: ["node", "server"]
+    image: docker.minutesmade.com/mmpulpfree-dev
     tty: true
     build:
       context: ./MM-PulpFree
+      dockerfile: dev.Dockerfile
     working_dir: /usr/mm/mm-pulpfree/app
     volumes:
       - ./MM-PulpFree/app:/usr/mm/mm-pulpfree/app
@@ -46,10 +47,11 @@ services:
   mm404:
     container_name: MM404
     hostname: mm404
-    image: docker.minutesmade.com/mm404
+    image: docker.minutesmade.com/mm404-dev
     tty: true
     build:
       context: ./MM404
+      dockerfile: dev.Dockerfile
     working_dir: /usr/mm/mm404
     volumes:
       - ./MM404:/usr/mm/mm404
@@ -62,11 +64,11 @@ services:
   mml:
     container_name: MML
     hostname: mml
-    image: docker.minutesmade.com/mml
-    command: ["python", "main_mml.py"]
+    image: docker.minutesmade.com/mml-dev
     tty: true
     build:
       context: ./MML
+      dockerfile: dev.Dockerfile
     working_dir: /usr/mm/mml
     volumes:
       - ./MML:/usr/mm/mml
@@ -76,11 +78,11 @@ services:
   mmkoolaid:
     container_name: MM-Koolaid
     hostname: mmkoolaid
-    image: docker.minutesmade.com/mmkoolaid
-    command: ["hypercorn", "--config", "python:hypercorn.py", "main_mmkoolaid:create_app()"]
+    image: docker.minutesmade.com/mmkoolaid-dev
     tty: true
     build:
       context: ./MM-Koolaid
+      dockerfile: dev.Dockerfile
     working_dir: /usr/mm/mm-koolaid
     volumes:
       - ./MM-Koolaid:/usr/mm/mm-koolaid
