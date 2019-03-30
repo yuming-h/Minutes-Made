@@ -12,15 +12,15 @@ blueprint = Blueprint('users', __name__)
 
 @blueprint.route('/users/create', methods=['POST'])
 async def users_create():
-    """Creates a user in the postgreas database."""
+    """Creates a user in the postgres database."""
     data = await request.get_json()
     user_data = data['user']
 
     try:
         async with current_app.pool.acquire() as connection:
             uid = await connection.fetchval(
-                """INSERT INTO users(email, password, country, language, firstname, lastname, lastlogin)
-                   VALUES ($1, $2, $3, $4, $5, $6, $7)
+                """INSERT INTO users(email, password, country, language, firstname, lastname, registerdate, lastlogin)
+                   VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                    RETURNING userid""",
                    *user_data
                 )

@@ -1,5 +1,4 @@
 const { hashPass } = require("../utils/hashPass");
-const { pool } = require("../middleware/db");
 const conf = require("../config/config");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");

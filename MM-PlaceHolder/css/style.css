@@ -1,0 +1,103 @@
+span {
+  color: white;
+}
+
+body {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  width: 99%;
+  height: 99%;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  text-align: center;
+}
+
+.speaker {
+  color: white;
+  display: inline-block;
+}
+
+.whiteLineDelayed,
+.whiteLine {
+  background-color: #1a18184b;
+  width: 0;
+  height: 3px;
+  margin: 0.5rem auto;
+  border-radius: 1px;
+  text-align: center;
+}
+
+.black {
+  background-color: black;
+}
+
+.subtitle-hidden {
+  font-family: "Merriweather", sans-serif;
+  font-size: 25px;
+  visibility: hidden;
+}
+
+.l1 {
+  color: black;
+  font-family: "Merriweather", sans-serif;
+  font-size: 25px;
+}
+
+.body-hidden {
+  font-family: "Merriweather", sans-serif;
+  font-size: 20px;
+  visibility: hidden;
+}
+
+.l2,
+.l3,
+.l4,
+.l5,
+.l6,
+.l7,
+.l8 {
+  color: black;
+  font-family: "Merriweather", sans-serif;
+  font-size: 20px;
+}
+
+.header {
+  color: black;
+  font-size: 35px;
+  margin: 0;
+  padding-top: 25px;
+}
+
+.footer {
+  color: black;
+  font-size: 40px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 3.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 2px;
+}
+
+.underline {
+  background-color: black;
+  width: 0;
+  height: 2px;
+  margin: 0.3rem auto;
+  text-align: center;
+}
+
+.page {
+  background-color: rgb(214, 212, 212);
+  border-radius: 3px;
+  height: 0;
+  width: 0;
+}
