@@ -4,8 +4,8 @@ const local = {
   app: {
     port: 8080
   },
-  meetingManagerDockerDomain: "http://192.168.1.82:2375",
-  meetingManagerDomain: "http://192.168.1.82:5001",
+  meetingManagerDockerDomain: "http://192.168.1.86:2375",
+  meetingManagerDomain: "http://192.168.1.86:5001",
   koolaidDomain: "http://mmkoolaid:5050",
   tokenSecret:
     "thisIsJustATestForLocalDon-tActuallyUseHardCodedKeyLikeThis10203ButIt'sPrettyLongSoMightBeOkHeHeXd"

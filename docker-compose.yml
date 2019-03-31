@@ -21,6 +21,8 @@ services:
     command: ["redis-server", "--appendonly", "yes", "--port", "6379"]
     ports:
       - "6379:6379"
+    networks:
+      - meetingmanager_404_net
 
   redis-write:
     container_name: redis-write
@@ -29,6 +31,8 @@ services:
     command: ["redis-server", "--appendonly", "yes", "--port", "6378"]
     ports:
       - "6378:6378"
+    networks:
+      - meetingmanager_404_net
 
   mmpulpfree:
     container_name: MM-PulpFree
@@ -88,3 +92,7 @@ services:
       - ./MM-Koolaid:/usr/mm/mm-koolaid
     ports:
       - "5050:5050"
+
+networks:
+  meetingmanager_404_net:
+    external: true

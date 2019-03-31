@@ -5,11 +5,11 @@ const axios = require("axios");
  * Forms the container information given a meetingId
  * @param Int meetingId
  */
-function GetContainerInfo(meetingId) {
+const GetContainerInfo = meetingId => {
   const meetingManagerDockerDomain = conf.meetingManagerDockerDomain;
   const meetingManagerDomain = conf.meetingManagerDomain;
   const containerHostName = "mm-meeting-" + meetingId;
-  const containerUrl = meetingManagerDomain + "/" + containerHostName;
+  const containerUrl = meetingManagerDomain + "/" + containerHostName + ":5000";
 
   return {
     meetingManagerDockerDomain: meetingManagerDockerDomain,
@@ -17,7 +17,7 @@ function GetContainerInfo(meetingId) {
     containerHostName: containerHostName,
     containerUrl: containerUrl
   };
-}
+};
 
 /**
  * Creates a meeting and preps a 404 container instance to use with it
@@ -50,7 +50,9 @@ const schedule = async body => {
       Image: "docker.minutesmade.com/mm404:latest",
       NetworkingConfig: {
         EndpointsConfig: {
-          meetingmanager_404_net: {}
+          meetingmanager_404_net: {
+            Aliases: [containerInfo.containerHostName]
+          }
         }
       }
     };
@@ -168,7 +170,7 @@ const finish = async body => {
     const containerInfo = GetContainerInfo(body.meetingId);
 
     // Send the finish meeting signal
-    const finishres = await axios.post(
+    const finishres = await axios.get(
       containerInfo.containerUrl + "/finish-meeting"
     );
 
