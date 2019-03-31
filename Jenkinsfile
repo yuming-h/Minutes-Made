@@ -63,6 +63,7 @@ pipeline {
                 stage ('Build Docker Images') {
                     steps {
                         sh 'docker-compose build'
+                        sh 'docker-compose -f docker-compose-deploy.yml build'
                     }
                 }
 
@@ -74,6 +75,7 @@ pipeline {
                     steps {
                         sh 'echo "$DOCKER_AUTH_PSW" | docker login docker.minutesmade.com -u "$DOCKER_AUTH_USR" --password-stdin'
                         sh 'docker-compose push'
+                        sh 'docker-compose -f docker-compose-deploy.yml push'
                     }
                 }
 

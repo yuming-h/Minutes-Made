@@ -5,6 +5,7 @@
 # Minutes Made, Copyright 2019
 # Maintainer: Eric Mikulin
 
+import sys
 import time
 import uuid
 import wave
@@ -44,6 +45,18 @@ meeting_id = None
 def index():
     """Return the client application. This frontend is used purely for testing purposes."""
     return render_template('index.html')
+
+@app.route('/finish-meeting')
+def finish_meeting():
+    """Performs the final actions to finish a meeting.
+    - Queue up the final ML job
+    - Await the response
+    - Write the response to DB
+    - Send the command to delete itself
+    - exit
+    """
+    sys.exit(4)
+    return None
 
 def start_meeting():
     """Preps MM404 to begin a meeting.
