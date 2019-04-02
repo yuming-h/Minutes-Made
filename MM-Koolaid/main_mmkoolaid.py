@@ -7,7 +7,7 @@
 
 import asyncpg
 import config_mm as conf
-from koolaid import integrations, users
+from koolaid import integrations, meetings, users
 from quart import Quart
 
 def create_app():
@@ -26,6 +26,7 @@ def create_app():
 
     # Register the sub apps, each app represents a table / data group
     app.register_blueprint(integrations.blueprint)
+    app.register_blueprint(meetings.blueprint)
     app.register_blueprint(users.blueprint)
 
     return app

@@ -1,0 +1,28 @@
+##### DEPLOY #####
+# This should only be used to easily build, tag and push the services, it can't really run them
+version: '3'
+
+services:
+  mmpulpfree:
+    image: docker.minutesmade.com/mmpulpfree
+    build:
+      context: ./MM-PulpFree
+      dockerfile: deploy.Dockerfile
+
+  mm404:
+    image: docker.minutesmade.com/mm404
+    build:
+      context: ./MM404
+      dockerfile: deploy.Dockerfile
+
+  mml:
+    image: docker.minutesmade.com/mml
+    build:
+      context: ./MML
+      dockerfile: deploy.Dockerfile
+
+  mmkoolaid:
+    image: docker.minutesmade.com/mmkoolaid
+    build:
+      context: ./MM-Koolaid
+      dockerfile: deploy.Dockerfile

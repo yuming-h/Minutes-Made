@@ -40,7 +40,7 @@ reset = async () => {
       language      CHAR(2),
       registerdate    BIGINT,
       lastlogin     BIGINT,
-      
+
       PRIMARY KEY (userid)
     );`);
 
@@ -84,10 +84,14 @@ reset = async () => {
 
   await db.query(`CREATE TABLE "meeting"
     (
-      meetingid  SERIAL,
-      transcript VARCHAR(10485760),
-      starttime  BIGINT,
-      endtime    BIGINT,
+      meetingid           SERIAL,
+      transcript          VARCHAR(10485760),
+      scheduledstarttime  BIGINT,
+      scheduledendtime    BIGINT,
+      starttime           BIGINT,
+      endtime             BIGINT,
+      active              BOOLEAN DEFAULT false,
+      containerid         VARCHAR(256),
 
       PRIMARY KEY (meetingid)
     );`);
