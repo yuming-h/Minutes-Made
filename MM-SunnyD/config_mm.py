@@ -1,0 +1,1 @@
+MONGOCONNECTIONURI = "mongodb://app:oZqs94JrzUTwc5l5hcA5@ds123645.mlab.com:23645/minutesmade"
