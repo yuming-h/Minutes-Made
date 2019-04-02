@@ -1,3 +1,3 @@
 # MM - Koolaid
 
-The SQL database reading service
+The SQL database reading/writing service

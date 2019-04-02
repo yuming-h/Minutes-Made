@@ -27,4 +27,5 @@ async def transcripts_add():
         return jsonify({'success': True, 'message': 'Transcript successfully added'}), 200
     return jsonify({'success': False, 'message': 'Bad request parameters'}), 400
 
-app.run()
+if __name__ == "__main__":
+    app.run()

@@ -93,6 +93,21 @@ services:
     ports:
       - "5050:5050"
 
+  mmsunnyd:
+    container_name: MM-SunnyD
+    hostname: mmsunnyd
+    image: docker.minutesmade.com/mmsunnyd-dev
+    tty: true
+    build:
+      context: ./MM-SunnyD
+      dockerfile: dev.Dockerfile
+    working_dir: /usr/mm/mm-sunnyd
+    volumes:
+      - ./MM-SunnyD:/usr/mm/mm-sunnyd
+    ports:
+      - "5055:5055"
+
+
 networks:
   meetingmanager_404_net:
     external: true
