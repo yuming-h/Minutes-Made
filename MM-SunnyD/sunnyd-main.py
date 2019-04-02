@@ -22,10 +22,29 @@ async def create_db():
 async def transcripts_add():
     """Adds a transcript to the MongoDB database"""
     data = await request.get_json()
-    if data.get('SpeakerID', None) is not None and data.get('Text', None) is not None:
+    if check_transcript_request(data):
         app.mongo.db.transcripts.insert_one(data)
         return jsonify({'success': True, 'message': 'Transcript successfully added'}), 200
     return jsonify({'success': False, 'message': 'Bad request parameters'}), 400
+
+def check_transcript_request(data):
+    """Validates transcript request"""
+    valid_response = True
+    if data.get('meeting_id', None) is None:
+        valid_response = False
+    if data.get('line_number', None) is None:
+        valid_response = False
+    if data.get('speaker_name', None) is None:
+        valid_response = False
+    if data.get('speaker_id', None) is None:
+        valid_response = False
+    if data.get('timestamp', None) is None:
+        valid_response = False
+    if data.get('line_text', None) is None:
+        valid_response = False
+    if data.get('action_item', None) is None:
+        valid_response = False
+    return valid_response
 
 if __name__ == "__main__":
     app.run()

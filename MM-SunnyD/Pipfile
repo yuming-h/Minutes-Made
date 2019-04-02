@@ -9,8 +9,6 @@ autopep8 = "*"
 
 [packages]
 quart = "*"
-asyncpg = "*"
-motor = "*"
 flask-pymongo = "*"
 
 [requires]
