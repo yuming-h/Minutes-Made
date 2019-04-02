@@ -20,19 +20,11 @@ async def create_db():
 
 @app.route('/transcripts/add', methods=['POST'])
 async def transcripts_add():
-    """Adds a transcrip to the MongoDB database"""
+    """Adds a transcript to the MongoDB database"""
     data = await request.get_json()
     if data.get('SpeakerID', None) is not None and data.get('Text', None) is not None:
         app.mongo.db.transcripts.insert_one(data)
         return jsonify({'success': True, 'message': 'Transcript successfully added'}), 200
     return jsonify({'success': False, 'message': 'Bad request parameters'}), 400
-
-# @app.route('/transcripts/fetch', methods=['GET'])
-# async def transcripts_fetch():
-#     """Fetches based on speaker ID"""
-#     data = await request.get_json()
-#     if data.get('SpeakerID', None) is not None
-#         data = app.mongo.db.transcripts.find(data)
-#         return jsonify(data), 200
 
 app.run()
