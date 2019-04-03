@@ -1,19 +1,29 @@
 # MM404
+
 Meeting session process
 
 ## Setup
+
 ```
 sudo docker-compose build
 ```
 
 ## Running
+
 ```
 sudo docker-compose up
 ```
+
 Then navigate to http://127.0.0.1 to test
 
+### Security group (endpoint exposure):
+
+External (Public)
+
 ## MML Job JSON Syntax:
+
 Audio processing job:
+
 ```
 {
   "job_type": "audio",
@@ -26,7 +36,8 @@ Audio processing job:
 }
 ```
 
-Transcript line JSON syntax: *(This syntax will be used for the SunnyD DB write also)*
+Transcript line JSON syntax: _(This syntax will be used for the SunnyD DB write also)_
+
 ```
 {
   "meeting_id": "thisisameetingidstring",
@@ -40,6 +51,7 @@ Transcript line JSON syntax: *(This syntax will be used for the SunnyD DB write 
 ```
 
 Meeting Post processing job:
+
 ```
 {
   "job_type": "postmeeting",
@@ -50,7 +62,8 @@ Meeting Post processing job:
 }
 ```
 
-Post Processing return syntax: *(This syntax will be used for the SunnyD DB write also)*
+Post Processing return syntax: _(This syntax will be used for the SunnyD DB write also)_
+
 ```
 {
   "meeting_id": "thisisameetingidstring",
@@ -63,3 +76,8 @@ Post Processing return syntax: *(This syntax will be used for the SunnyD DB writ
     ]
 }
 ```
+
+### Maintainers:
+
+- Primary: Eric Mikulin (@ErisMik)
+- Secondary: Justin Derwee-Church (@MuchToKnow)

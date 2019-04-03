@@ -66,7 +66,6 @@ const login = async body => {
       })
       //Catch missing emails and throw a KnownError which will be caught and returned to user.
       .catch(err => {
-        console.log(err);
         if (err.response && err.response.status == 404) {
           throw new KnownError(
             "Email not found, please check it or signup at: ",

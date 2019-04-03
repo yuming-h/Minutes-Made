@@ -15,7 +15,11 @@ NodeJS backend
 - Bump package.json version for any changes.
 - Record changes in CHANGELOG.md
 
+### Security group (endpoint exposure):
+
+External (Public)
+
 ### Maintainers:
 
-Primary: Justin Derwee-Church (@muchtoknow)
-Secondary: Yuming He (@yuming-h)
+- Primary: Justin Derwee-Church (@muchtoknow)
+- Secondary: Yuming He (@yuming-h)
