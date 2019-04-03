@@ -10,6 +10,11 @@ services:
       - "5001:80"
     networks:
       - 404_net
+    volumes:
+      - 404-static-volume:/www/static
+
+volumes:
+  404-static-volume:
 
 networks:
   404_net:

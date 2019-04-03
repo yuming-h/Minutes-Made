@@ -54,6 +54,16 @@ const schedule = async body => {
             Aliases: [containerInfo.containerHostName]
           }
         }
+      },
+      HostConfig: {
+        Mounts: [
+          {
+            Type: "volume",
+            Source: "meetingmanager_404-static-volume",
+            Target: "/usr/mm/mm404/static",
+            ReadOnly: false
+          }
+        ]
       }
     };
     const createRes = await axios.post(
@@ -129,7 +139,7 @@ const start = async body => {
     );
     return {
       meetingId: body.meetingId,
-      meetingUrl: containerInfo.containerUrl
+      meetingUrl: containerInfo.containerUrl + "/"
     };
   } catch (e) {
     console.log(e);
@@ -150,7 +160,7 @@ const connect = async body => {
 
     return {
       meetingId: body.meetingId,
-      meetingUrl: containerInfo.containerUrl
+      meetingUrl: containerInfo.containerUrl + "/"
     };
   } catch (e) {
     console.log(e);
