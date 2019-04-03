@@ -2,6 +2,7 @@ const app = (module.exports = require("express")());
 
 const { signup, login } = require("../actions").auth;
 
+//Signs a user up, creating an entry into our postgres db
 app.post("/signup", (req, res) => {
   signup(req.body)
     .then(() =>

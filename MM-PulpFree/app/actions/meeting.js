@@ -170,9 +170,7 @@ const finish = async body => {
     const containerInfo = GetContainerInfo(body.meetingId);
 
     // Send the finish meeting signal
-    const finishres = await axios.get(
-      containerInfo.containerUrl + "/finish-meeting"
-    );
+    await axios.get(containerInfo.containerUrl + "/finish-meeting");
 
     // Set the meeting as inactive
     await axios.put(conf.koolaidDomain + "/meetings/active", {

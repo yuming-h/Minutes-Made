@@ -65,14 +65,15 @@ const login = async body => {
         email: requestEmail
       })
       //Catch missing emails and throw a KnownError which will be caught and returned to user.
-      .catch(error => {
-        if (error.response && error.response.status == 404) {
+      .catch(err => {
+        console.log(err);
+        if (err.response && err.response.status == 404) {
           throw new KnownError(
             "Email not found, please check it or signup at: ",
             ErrorCodes.AUTH.EMAIL_NOT_FOUND
           );
         } else {
-          throw error;
+          throw err;
         }
       });
 
@@ -106,11 +107,11 @@ const login = async body => {
       return jwt.sign(jwtBody, conf.tokenSecret, jwtOpts);
     }
   } catch (e) {
-    console.log(e);
     //Throws expected errors while throwing the generic for others.
     if (e instanceof KnownError) {
       throw e;
     }
+    console.log(e);
     throw new Error("Error logging in, please try again");
   }
 };
