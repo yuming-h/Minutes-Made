@@ -36,7 +36,7 @@ const signup = async body => {
     ];
 
     // Make the write request to the db writer service
-    const res = await axios.post("http://mmkoolaid:5050/users/create", {
+    const res = await axios.post(conf.koolaidDomain + "/users/create", {
       user: dbArr
     });
     console.log("Created user with id " + res.data.userId);
@@ -61,7 +61,7 @@ const login = async body => {
 
     // Get the password data from the db writer service
     const res = await axios
-      .post("http://mmkoolaid:5050/users/password", {
+      .post(conf.koolaidDomain + "/users/password", {
         email: requestEmail
       })
       //Catch missing emails and throw a KnownError which will be caught and returned to user.
@@ -89,7 +89,7 @@ const login = async body => {
       const d = new Date();
       const epochSeconds = Math.round(d.getTime() / 1000);
 
-      await axios.put("http://mmkoolaid:5050/users/login-timestamp", {
+      await axios.put(conf.koolaidDomain + "/users/login-timestamp", {
         email: body.email,
         timestamp: epochSeconds
       });
