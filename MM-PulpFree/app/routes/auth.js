@@ -2,6 +2,7 @@ const app = (module.exports = require("express")());
 
 const { signup, login } = require("../actions").auth;
 
+//Signs a user up, creating an entry into our postgres db
 app.post("/signup", (req, res) => {
   signup(req.body)
     .then(() =>
@@ -23,6 +24,9 @@ app.post("/login", (req, res) => {
       })
     )
     .catch(err => {
+      if (err instanceof KnownError) {
+        res.status(401).send(err.message);
+      }
       res.status(500).send(err.message);
     });
 });

@@ -1,2 +1,12 @@
-# MM-SunnyD (Transcript Writer Service)
-Reads off queue to write new lines of transcripts to the db.
+# MM-SunnyD (Mongo Read/Write)
+
+The noSQL database reading/writing service
+
+### Security group (Endpoint exposure):
+
+Internal
+
+### Maintainers:
+
+- Primary: Harry Yao (@yaoharry)
+- Secondary: Justin Derwee-Church (@MuchToKnow)
