@@ -1,3 +1,12 @@
-# MM - SunnyD
+# MM-SunnyD (Mongo Read/Write)
 
-The MongoDB reading/writing service
+The noSQL database reading/writing service
+
+### Security group (Endpoint exposure):
+
+Internal
+
+### Maintainers:
+
+- Primary: Harry Yao (@yaoharry)
+- Secondary: Justin Derwee-Church (@MuchToKnow)
