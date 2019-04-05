@@ -29,21 +29,11 @@ async def transcripts_add():
 
 def check_transcript_request(data):
     """Validates transcript request"""
+    mandatory_keys = ['meeting_id', 'line_number', 'timestamp', 'line_text']
     valid_response = True
-    if data.get('meeting_id', None) is None:
-        valid_response = False
-    if data.get('line_number', None) is None:
-        valid_response = False
-    if data.get('speaker_name', None) is None:
-        valid_response = False
-    if data.get('speaker_id', None) is None:
-        valid_response = False
-    if data.get('timestamp', None) is None:
-        valid_response = False
-    if data.get('line_text', None) is None:
-        valid_response = False
-    if data.get('action_item', None) is None:
-        valid_response = False
+    for key in mandatory_keys:
+        if data.get(key, None) is None:
+            valid_response = False
     return valid_response
 
 if __name__ == "__main__":
