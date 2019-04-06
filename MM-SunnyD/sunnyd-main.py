@@ -47,7 +47,6 @@ def append_missing_optionals(data):
     for key in optional_arr_keys:
         if data.get(key, None) is None:
             data[key] = []
-    print (data)
 
     return data
 
