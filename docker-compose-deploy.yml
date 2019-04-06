@@ -26,3 +26,9 @@ services:
     build:
       context: ./MM-Koolaid
       dockerfile: deploy.Dockerfile
+
+  mmsunnyd:
+    image: docker.minutesmade.com/mmsunnyd
+    build:
+      context: ./MM-SunnyD
+      dockerfile: deploy.Dockerfile
