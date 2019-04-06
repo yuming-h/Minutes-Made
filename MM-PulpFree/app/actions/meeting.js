@@ -54,6 +54,16 @@ const schedule = async body => {
             Aliases: [containerInfo.containerHostName]
           }
         }
+      },
+      HostConfig: {
+        Mounts: [
+          {
+            Type: "volume",
+            Source: "meetingmanager_404-static-volume",
+            Target: "/usr/mm/mm404/static",
+            ReadOnly: false
+          }
+        ]
       }
     };
     const createRes = await axios.post(
@@ -129,7 +139,7 @@ const start = async body => {
     );
     return {
       meetingId: body.meetingId,
-      meetingUrl: containerInfo.containerUrl
+      meetingUrl: containerInfo.containerUrl + "/"
     };
   } catch (e) {
     console.log(e);
@@ -150,7 +160,7 @@ const connect = async body => {
 
     return {
       meetingId: body.meetingId,
-      meetingUrl: containerInfo.containerUrl
+      meetingUrl: containerInfo.containerUrl + "/"
     };
   } catch (e) {
     console.log(e);
@@ -170,9 +180,7 @@ const finish = async body => {
     const containerInfo = GetContainerInfo(body.meetingId);
 
     // Send the finish meeting signal
-    const finishres = await axios.get(
-      containerInfo.containerUrl + "/finish-meeting"
-    );
+    await axios.get(containerInfo.containerUrl + "/finish-meeting");
 
     // Set the meeting as inactive
     await axios.put(conf.koolaidDomain + "/meetings/active", {
