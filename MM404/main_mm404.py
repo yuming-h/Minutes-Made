@@ -12,6 +12,7 @@ import wave
 import json
 import redis
 import eventlet
+import requests
 import numpy as np
 from collections import deque
 from flask import Flask, render_template, current_app, session, url_for
@@ -68,16 +69,17 @@ def start_meeting():
     global redis_processing
     redis_processing = redis.StrictRedis(host='redis-processing', port=6379, db=0)
 
-    # Connect to the db write redis database
-    global redis_write
-    redis_write = redis.StrictRedis(host='redis-write', port=6378, db=0)
-
     # Get the meeting ID
     global meeting_id
     meeting_id = uuid.uuid4().hex  # TODO: This is temporary until PulpFree spawing is configured, this currently breaks multiple gunicorn workers :(
 
+    # Tell SunnyD to create the meeting
+    result = requests.post('http://mmsunnyd:5055/transcripts/add', json={'meeting_id': meeting_id})
+    if result.status_code != 200:
+        print('Error creating meeting in SunnyD: ', result.text)
+
     # Spawn sync thread
-    eventlet.monkey_patch()  # Patch modules to be non-blocking (Looking at you REDIS!)
+    eventlet.monkey_patch()  # Patch modules to be non-blocking
     eventlet.spawn(transcript_sync_worker)
     print("Ready to start meeting!")
 
@@ -186,12 +188,14 @@ def transcript_sync_worker():
         # Get the transcript from redis
         new_transcript_lines = worker_transcript_reader.read_new_lines()
 
-        # Process the new lines
-        for transcript_line in new_transcript_lines:
-            # Enqueue line to go write to the database
-            redis_write.lpush(REDIS_WRITE_QUEUE_KEY, json.dumps(transcript_line))
+        # Insert the transcript items into the database
+        if len(new_transcript_lines) > 0:
+            result = requests.post('http://mmsunnyd:5055/transcripts/add-lines', json={'meeting_id': meeting_id, 'lines': new_transcript_lines})
+            if result.status_code != 200:
+                print('Error sending lines to SunnyD: ', result.text)
 
-            # Process action item
+        # Process the action items of the lines
+        for transcript_line in new_transcript_lines:
             if transcript_line['action_item']:
                 print("ACTION ITEM!")
 
