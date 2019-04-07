@@ -1,2 +1,0 @@
-# MMOJ
-Minutes Made frontend.

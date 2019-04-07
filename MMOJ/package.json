@@ -1,21 +1,34 @@
 {
-  "name": "mmoj",
+  "name": "next-test",
   "version": "1.0.0",
-  "description": "Frontend for Minutes Made.",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "next",
-    "build": "next build",
-    "start": "next start"
-  },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "next": "^8.0.3",
-    "react": "^16.8.5",
-    "react-dom": "^16.8.5",
-    "redux": "^4.0.1",
-    "semantic-ui-react": "^0.86.0"
+    "@zeit/next-css": "^1.0.1",
+    "axios": "^0.18.0",
+    "express": "^4.16.4",
+    "file-loader": "^2.0.0",
+    "google-maps-react": "^2.0.2",
+    "http-server": "^0.11.1",
+    "js-cookie": "^2.2.0",
+    "next": "^7.0.2",
+    "next-server": "^8.0.3",
+    "nprogress": "^0.2.0",
+    "react": "^16.8.4",
+    "react-dom": "^16.8.4",
+    "react-is": "^16.8.4",
+    "semantic-ui-css": "^2.4.1",
+    "semantic-ui-react": "^0.83.0",
+    "url-loader": "^1.1.2"
+  },
+  "scripts": {
+    "dev": "node start.js",
+    "build": "NODE_ENV=production next build",
+    "start": "NODE_ENV=production node start.js"
+  },
+  "devDependencies": {
+    "babel-plugin-transform-define": "^1.3.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-register": "^6.26.0"
   }
 }
