@@ -1,3 +1,4 @@
+##### DEV #####
 version: '3'
 
 services:
@@ -20,6 +21,8 @@ services:
     command: ["redis-server", "--appendonly", "yes", "--port", "6379"]
     ports:
       - "6379:6379"
+    networks:
+      - meetingmanager_404_net
 
   redis-write:
     container_name: redis-write
@@ -28,15 +31,17 @@ services:
     command: ["redis-server", "--appendonly", "yes", "--port", "6378"]
     ports:
       - "6378:6378"
+    networks:
+      - meetingmanager_404_net
 
   mmpulpfree:
     container_name: MM-PulpFree
     hostname: mmpulpfree
-    image: docker.minutesmade.com/mmpulpfree
-    command: ["node", "server"]
+    image: docker.minutesmade.com/mmpulpfree-dev
     tty: true
     build:
       context: ./MM-PulpFree
+      dockerfile: dev.Dockerfile
     working_dir: /usr/mm/mm-pulpfree/app
     volumes:
       - ./MM-PulpFree/app:/usr/mm/mm-pulpfree/app
@@ -46,11 +51,11 @@ services:
   mm404:
     container_name: MM404
     hostname: mm404
-    image: docker.minutesmade.com/mm404
-    command: ["gunicorn", "-k", "eventlet", "-w", "1", "main_mm404:app", "--bind=0.0.0.0:5000", "--no-sendfile"]
+    image: docker.minutesmade.com/mm404-dev
     tty: true
     build:
       context: ./MM404
+      dockerfile: dev.Dockerfile
     working_dir: /usr/mm/mm404
     volumes:
       - ./MM404:/usr/mm/mm404
@@ -63,11 +68,11 @@ services:
   mml:
     container_name: MML
     hostname: mml
-    image: docker.minutesmade.com/mml
-    command: ["python", "main_mml.py"]
+    image: docker.minutesmade.com/mml-dev
     tty: true
     build:
       context: ./MML
+      dockerfile: dev.Dockerfile
     working_dir: /usr/mm/mml
     volumes:
       - ./MML:/usr/mm/mml
@@ -77,13 +82,32 @@ services:
   mmkoolaid:
     container_name: MM-Koolaid
     hostname: mmkoolaid
-    image: docker.minutesmade.com/mmkoolaid
-    command: ["hypercorn", "--config", "python:hypercorn.py", "main_mmkoolaid:create_app()"]
+    image: docker.minutesmade.com/mmkoolaid-dev
     tty: true
     build:
       context: ./MM-Koolaid
+      dockerfile: dev.Dockerfile
     working_dir: /usr/mm/mm-koolaid
     volumes:
       - ./MM-Koolaid:/usr/mm/mm-koolaid
     ports:
       - "5050:5050"
+
+  mmsunnyd:
+    container_name: MM-SunnyD
+    hostname: mmsunnyd
+    image: docker.minutesmade.com/mmsunnyd-dev
+    tty: true
+    build:
+      context: ./MM-SunnyD
+      dockerfile: dev.Dockerfile
+    working_dir: /usr/mm/mm-sunnyd
+    volumes:
+      - ./MM-SunnyD:/usr/mm/mm-sunnyd
+    ports:
+      - "5055:5055"
+
+
+networks:
+  meetingmanager_404_net:
+    external: true

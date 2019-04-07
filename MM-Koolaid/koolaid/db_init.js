@@ -40,7 +40,7 @@ reset = async () => {
       language      CHAR(2),
       registerdate    BIGINT,
       lastlogin     BIGINT,
-      
+
       PRIMARY KEY (userid)
     );`);
 
@@ -84,10 +84,14 @@ reset = async () => {
 
   await db.query(`CREATE TABLE "meeting"
     (
-      meetingid  SERIAL,
-      transcript VARCHAR(10485760),
-      starttime  BIGINT,
-      endtime    BIGINT,
+      meetingid           SERIAL,
+      transcript          VARCHAR(10485760),
+      scheduledstarttime  BIGINT,
+      scheduledendtime    BIGINT,
+      starttime           BIGINT,
+      endtime             BIGINT,
+      active              BOOLEAN DEFAULT false,
+      containerid         VARCHAR(256),
 
       PRIMARY KEY (meetingid)
     );`);
@@ -196,6 +200,28 @@ reset = async () => {
       VALUES($1, $2, $3)`,
     [4, 1, epochSeconds]
   );
+
+  //Grant read/write to app user on all re-built tables
+  await db.query(`
+  GRANT SELECT ON TABLE public.users TO app;
+  GRANT INSERT ON TABLE public.users TO app;
+  GRANT UPDATE ON TABLE public.users TO app;
+  GRANT SELECT ON TABLE public.org TO app;
+  GRANT INSERT ON TABLE public.org TO app;
+  GRANT UPDATE ON TABLE public.org TO app;
+  GRANT SELECT ON TABLE public.user_in_org TO app;
+  GRANT INSERT ON TABLE public.user_in_org TO app;
+  GRANT UPDATE ON TABLE public.user_in_org TO app;
+  GRANT SELECT ON TABLE public.user_admin_org TO app;
+  GRANT INSERT ON TABLE public.user_admin_org TO app;
+  GRANT UPDATE ON TABLE public.user_admin_org TO app;
+  GRANT SELECT ON TABLE public.meeting TO app;
+  GRANT INSERT ON TABLE public.meeting TO app;
+  GRANT UPDATE ON TABLE public.meeting TO app;
+  GRANT SELECT ON TABLE public.user_in_org_in_meeting TO app;
+  GRANT INSERT ON TABLE public.user_in_org_in_meeting TO app;
+  GRANT UPDATE ON TABLE public.user_in_org_in_meeting TO app;
+  `);
 };
 
 reset()
