@@ -20,13 +20,35 @@ async def create_db():
 
 @app.route('/transcripts/add', methods=['POST'])
 async def transcripts_add():
-    """Adds a transcript to the MongoDB database"""
+    """Creates an meeting object in MongoDB"""
     data = await request.get_json()
-    if check_transcript_request(data):
-        data = append_missing_optionals(data)
-        app.mongo.db.transcripts.insert_one(data)
-        return jsonify({'success': True, 'message': 'Transcript successfully added'}), 200
-    return jsonify({'success': False, 'message': 'Bad request parameters'}), 400
+    meeting_id = data['meeting_id']
+
+    result = app.mongo.db.transcripts.insert_one({'meeting_id': meeting_id, 'lines': []})
+    return jsonify({'success': True, 'message': 'Transcript successfully added'}), 200
+
+@app.route('/transcripts/add-lines', methods=['POST'])
+async def transcripts_add_lines():
+    """Appends an array of transcript lines to the MongoDB database"""
+    data = await request.get_json()
+    meeting_id = data['meeting_id']
+    meeting_lines = data['lines']
+
+    try:
+        # Perform verification on the lines and appends to item in MongoDB
+        write_lines = [append_missing_optionals(line) for line in meeting_lines if check_transcript_request(line)]
+        result = app.mongo.db.transcripts.update_one({'meeting_id': meeting_id}, {'$push': {'lines': {'$each': write_lines}}})
+
+        # Ensure a complete write
+        if result.matched_count == 0:
+            raise Exception("Could not find meeting object with meeting_id to update")
+        if result.modified_count == 0:
+            raise Exception("Failed to update the transcript item with lines from the database")
+        # Else
+        return jsonify({'success': True, 'message': 'Lines successfully added'}), 200
+
+    except Exception as err:
+        return jsonify({'success': False, 'message': '{}'.format(err)}), 400
 
 def check_transcript_request(data):
     """Validates transcript request"""
@@ -34,7 +56,7 @@ def check_transcript_request(data):
     valid_response = True
     for key in mandatory_keys:
         if data.get(key, None) is None:
-            valid_response = False
+            raise Exception("{} is None when it should not be!".format(key))
     return valid_response
 
 def append_missing_optionals(data):
@@ -47,7 +69,6 @@ def append_missing_optionals(data):
     for key in optional_arr_keys:
         if data.get(key, None) is None:
             data[key] = []
-
     return data
 
 if __name__ == "__main__":

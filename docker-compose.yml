@@ -22,16 +22,7 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - meetingmanager_404_net
-
-  redis-write:
-    container_name: redis-write
-    hostname: redis-write
-    image: redis:4.0.5-alpine
-    command: ["redis-server", "--appendonly", "yes", "--port", "6378"]
-    ports:
-      - "6378:6378"
-    networks:
+      - default
       - meetingmanager_404_net
 
   mmpulpfree:
@@ -62,7 +53,6 @@ services:
     ports:
       - "5000:5000"
     depends_on:
-      - redis-write
       - redis-processing
 
   mml:
@@ -111,3 +101,4 @@ services:
 networks:
   meetingmanager_404_net:
     external: true
+  default:
