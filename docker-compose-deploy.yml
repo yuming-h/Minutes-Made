@@ -15,6 +15,12 @@ services:
       context: ./MM404
       dockerfile: deploy.Dockerfile
 
+  mm404manager:
+    image: docker.minutesmade.com/mm404-manager
+    build:
+      context: ./MM404/MeetingManager
+      dockerfile: Dockerfile
+
   mml:
     image: docker.minutesmade.com/mml
     build:

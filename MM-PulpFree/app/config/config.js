@@ -1,17 +1,19 @@
 const env = process.env.NODE_ENV || "local";
 
 const local = {
+  env: env,
   app: {
     port: 8080
   },
-  meetingManagerDockerDomain: "http://172.20.10.5:2375",
-  meetingManagerDomain: "http://172.20.10.5:5001",
+  meetingManagerDockerDomain: "http://192.168.1.86:2375",
+  meetingManagerDomain: "http://192.168.1.86:5001",
   koolaidDomain: "http://mmkoolaid:5050",
   tokenSecret:
     "thisIsJustATestForLocalDon-tActuallyUseHardCodedKeyLikeThis10203ButIt'sPrettyLongSoMightBeOkHeHeXd"
 };
 
 const dev = {
+  env: env,
   app: {
     port: 8080
   },
@@ -23,6 +25,7 @@ const dev = {
 };
 
 const production = {
+  env: env,
   app: {
     port: 8080
   },
