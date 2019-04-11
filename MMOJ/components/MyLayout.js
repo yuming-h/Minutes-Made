@@ -1,22 +1,23 @@
-import 'semantic-ui-css/semantic.mm.css';
-import Header from './Header'
-import NProgress from 'nprogress'
-import Router from 'next/router'
+import "semantic-ui-css/semantic.mm.css";
+import Header from "./Header";
+import NProgress from "nprogress";
+import Router from "next/router";
 
 Router.onRouteChangeStart = () => {
-  console.log("ROUTE STARTED")
-  NProgress.start()}
-Router.onRouteChangeComplete = () => {console.log("route done")
-NProgress.done()}
-Router.onRouteChangeError = () => NProgress.done()
+  console.log("ROUTE STARTED");
+  NProgress.start();
+};
+Router.onRouteChangeComplete = () => {
+  console.log("route done");
+  NProgress.done();
+};
+Router.onRouteChangeError = () => NProgress.done();
 
-
-
-const Layout = (props) => (
+const Layout = props => (
   <div>
-    <Header/>
+    <Header />
     {props.children}
   </div>
-)
+);
 
-export default Layout
+export default Layout;

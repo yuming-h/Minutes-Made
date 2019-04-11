@@ -23,8 +23,8 @@
   },
   "scripts": {
     "dev": "node start.js",
-    "build": "NODE_ENV=production next build",
-    "start": "NODE_ENV=production node start.js"
+    "build": "next build",
+    "export": "next export"
   },
   "devDependencies": {
     "babel-plugin-transform-define": "^1.3.0",
