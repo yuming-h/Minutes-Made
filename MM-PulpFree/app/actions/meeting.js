@@ -48,6 +48,7 @@ const schedule = async body => {
       Hostname: containerInfo.containerHostName,
       Domainname: containerInfo.containerHostName,
       Image: "docker.minutesmade.com/mm404:latest",
+      Env: ["MM_MEETING_ID=" + meetingInfo.meetingId, "MM_ENV=" + conf.env],
       NetworkingConfig: {
         EndpointsConfig: {
           meetingmanager_404_net: {

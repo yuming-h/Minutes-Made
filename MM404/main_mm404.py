@@ -5,6 +5,7 @@
 # Minutes Made, Copyright 2019
 # Maintainer: Eric Mikulin
 
+import os
 import sys
 import time
 import uuid
@@ -14,6 +15,7 @@ import redis
 import eventlet
 import requests
 import numpy as np
+import config_mm404 as conf
 from collections import deque
 from flask import Flask, render_template, current_app, session, url_for
 from flask_socketio import SocketIO, emit
@@ -67,21 +69,23 @@ def start_meeting():
     """
     # Conect to the processing redis database
     global redis_processing
-    redis_processing = redis.StrictRedis(host='redis-processing', port=6379, db=0)
+    redis_processing = redis.StrictRedis(host=conf.REDIS_HOST, port=6379, db=0)
 
     # Get the meeting ID
     global meeting_id
-    meeting_id = uuid.uuid4().hex  # TODO: This is temporary until PulpFree spawing is configured, this currently breaks multiple gunicorn workers :(
+    meeting_id = os.environ.get('MM_MEETING_ID')  # Get the meeting ID from the environment (Set by docker container)
+    if not meeting_id:  # Resort to a generated meeting id string otherwise
+        meeting_id = uuid.uuid4().hex
 
     # Tell SunnyD to create the meeting
-    result = requests.post('http://mmsunnyd:5055/transcripts/add', json={'meeting_id': meeting_id})
+    result = requests.post(conf.SUNNYD_DOMAIN+'/transcripts/add', json={'meeting_id': meeting_id})
     if result.status_code != 200:
         print('Error creating meeting in SunnyD: ', result.text)
 
     # Spawn sync thread
     eventlet.monkey_patch()  # Patch modules to be non-blocking
     eventlet.spawn(transcript_sync_worker)
-    print("Ready to start meeting!")
+    print("Ready to start meeting! Meeting ID", meeting_id)
 
 @socketio.on('connect')
 def on_connect():
@@ -190,7 +194,7 @@ def transcript_sync_worker():
 
         # Insert the transcript items into the database
         if len(new_transcript_lines) > 0:
-            result = requests.post('http://mmsunnyd:5055/transcripts/add-lines', json={'meeting_id': meeting_id, 'lines': new_transcript_lines})
+            result = requests.post(conf.SUNNYD_DOMAIN+'/transcripts/add-lines', json={'meeting_id': meeting_id, 'lines': new_transcript_lines})
             if result.status_code != 200:
                 print('Error sending lines to SunnyD: ', result.text)
 
