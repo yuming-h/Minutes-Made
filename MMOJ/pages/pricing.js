@@ -1,7 +1,7 @@
 import Layout from "../components/MyLayout.js";
 
 const pageStyle = {
-  margin: "25px 50px 25px 30px"
+  margin: process.env.DEFAULT_PAGE_MARGINS
 };
 
 const Pricing = () => (

@@ -4,7 +4,7 @@ import Head from "next/head";
 import Link from "next/link";
 
 const pageStyle = {
-  margin: "25px 50px 25px 30px"
+  margin: process.env.DEFAULT_PAGE_MARGINS
 };
 
 const Index = props => (
