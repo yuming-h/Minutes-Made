@@ -1,4 +1,4 @@
-import "semantic-ui-css/semantic.mm.css";
+import "semantic-ui-css/semantic.min.css";
 import Header from "./Header";
 import NProgress from "nprogress";
 import Router from "next/router";

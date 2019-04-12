@@ -17,7 +17,7 @@ const headerFontStyle = {
 export default class Header extends Component {
   render() {
     return (
-      <Menu secondary>
+      <Menu secondary stackable>
         <Link href="/">
           <Menu.Item name="home">
             <img style={logoStyle} src="/static/logo.png/" alt="logo" />
