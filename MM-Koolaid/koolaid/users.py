@@ -66,3 +66,29 @@ async def users_login_timestamp():
                user_email
             )
     return jsonify({"success": True})
+
+@blueprint.route('/users/<int:user_id>/meetings', methods=['GET'])
+async def users_transcripts(user_id):
+    """Gets the meeting metadata for a user."""
+
+    async with current_app.pool.acquire() as connection:
+        meeting_records = await connection.fetch(
+            """SELECT meetingId
+               FROM  user_in_org_in_meeting
+               WHERE userid = $1""",
+               user_id,
+            )
+
+        if not meeting_records:
+            abort(404)
+
+        meeting_ids = [record['meetingid'] for record in meeting_records]
+
+        meeting_meta_records = await connection.fetch(
+            """SELECT meetingid, starttime, endtime, active, scheduledstarttime, scheduledendtime
+               FROM meeting
+               WHERE meetingid = ANY($1::int[])""",
+               meeting_ids,
+            )
+
+        return jsonify([dict(record) for record in meeting_meta_records])
