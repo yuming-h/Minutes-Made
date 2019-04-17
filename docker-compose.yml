@@ -39,6 +39,21 @@ services:
     ports:
       - "8080:8080"
 
+  mmoj:
+    container_name: MMOJ
+    hostname: mmoj
+    image: docker.minutesmade.com/mmoj-dev
+    tty: true
+    build:
+      context: ./MMOJ
+      dockerfile: dev.Dockerfile
+    working_dir: /usr/mm/mmoj
+    volumes:
+      - ./MMOJ:/usr/mm/mmoj
+      - /usr/mm/mmoj/node_modules/
+    ports:
+      - "3000:3000"
+
   mm404:
     container_name: MM404
     hostname: mm404
