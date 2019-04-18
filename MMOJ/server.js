@@ -1,6 +1,6 @@
 const express = require("express");
 const next = require("next");
-const { get } = require("./lib/Request");
+const { get } = require("./api/Request");
 
 const dev = process.env.NODE_ENV !== "production";
 const app = next({ dev });
