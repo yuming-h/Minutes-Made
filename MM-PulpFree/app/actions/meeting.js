@@ -187,9 +187,7 @@ const finish = async body => {
       }
     });
     if (activeRes.data.active === false) {
-      throw new Error(
-        "Meeting already finished, can't finish again."
-      );
+      throw new Error("Meeting already finished, can't finish again.");
     }
 
     // Send the finish meeting signal
