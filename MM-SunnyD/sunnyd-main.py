@@ -27,6 +27,28 @@ async def transcripts_add():
     result = app.mongo.db.transcripts.insert_one({'meeting_id': meeting_id, 'lines': []})
     return jsonify({'success': True, 'message': 'Transcript successfully added'}), 200
 
+@app.route('/transcripts/add-tags', methods=['POST'])
+async def transcripts_add_tags():
+    """Writes tags to a meeting transcript in the MongoDB database"""
+    data = await request.get_json()
+    meeting_id = data['meeting_id']
+    meeting_tags = data['data']['tags']
+
+    try:
+        # Perform verification on the lines and appends to item in MongoDB
+        result = app.mongo.db.transcripts.update_one({'meeting_id': meeting_id}, {'$set': {'tags': meeting_tags}})
+
+        # Ensure a complete write
+        if result.matched_count == 0:
+            raise Exception("Could not find meeting object with meeting_id to update")
+        if result.modified_count == 0:
+            raise Exception("Failed to add the tags to the meeting object in the database")
+        # Else
+        return jsonify({'success': True, 'message': 'Tags successfully added'}), 200
+
+    except Exception as err:
+        return jsonify({'success': False, 'message': '{}'.format(err)}), 400
+
 @app.route('/transcripts/add-lines', methods=['POST'])
 async def transcripts_add_lines():
     """Appends an array of transcript lines to the MongoDB database"""
@@ -36,7 +58,7 @@ async def transcripts_add_lines():
 
     try:
         # Perform verification on the lines and appends to item in MongoDB
-        write_lines = [append_missing_optionals(line) for line in meeting_lines if check_transcript_request(line)]
+        write_lines = [_append_missing_optionals(line) for line in meeting_lines if _check_transcript_request(line)]
         result = app.mongo.db.transcripts.update_one({'meeting_id': meeting_id}, {'$push': {'lines': {'$each': write_lines}}})
 
         # Ensure a complete write
@@ -50,7 +72,7 @@ async def transcripts_add_lines():
     except Exception as err:
         return jsonify({'success': False, 'message': '{}'.format(err)}), 400
 
-def check_transcript_request(data):
+def _check_transcript_request(data):
     """Validates transcript request"""
     mandatory_keys = ['meeting_id', 'line_number', 'timestamp', 'line_text']
     valid_response = True
@@ -59,7 +81,7 @@ def check_transcript_request(data):
             raise Exception("{} is None when it should not be!".format(key))
     return valid_response
 
-def append_missing_optionals(data):
+def _append_missing_optionals(data):
     """Appends missing optional keys to request"""
     optional_keys = ['speaker_id', 'speaker_name']
     optional_arr_keys = ['action_items']

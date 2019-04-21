@@ -180,6 +180,18 @@ const finish = async body => {
   try {
     const containerInfo = GetContainerInfo(body.meetingId);
 
+    // Check that the meeting has not already been finished
+    const activeRes = await axios.get(conf.koolaidDomain + "/meetings/active", {
+      data: {
+        meetingId: body.meetingId
+      }
+    });
+    if (activeRes.data.active === false) {
+      throw new Error(
+        "Meeting already finished, can't finish again."
+      );
+    }
+
     // Send the finish meeting signal
     await axios.get(containerInfo.containerUrl + "/finish-meeting");
 
@@ -203,51 +215,6 @@ const finish = async body => {
   } catch (e) {
     console.log(e);
     throw new Error("Error finishing meeting, please try again.");
-  }
-};
-
-/**
- * Deletes the 404 container, called by the 404 instance itself
- * body: {
- *  meetingId: Int
- * }
- * @param Object body
- */
-const end = async body => {
-  try {
-    const containerInfo = GetContainerInfo(body.meetingId);
-
-    // Check that the meeting has been sent the shutdown signal first
-    const activeRes = await axios.get(conf.koolaidDomain + "/meetings/active", {
-      data: {
-        meetingId: body.meetingId
-      }
-    });
-    if (activeRes.data.active === true) {
-      throw new Error(
-        "Cannot delete meeting in progress, please finish the meeting first."
-      );
-    }
-
-    // Get the container id from the database
-    const res = await axios.get(conf.koolaidDomain + "/meetings/containerid", {
-      data: {
-        meetingId: body.meetingId
-      }
-    });
-    const containerId = res.data.containerId;
-
-    // Delete the 404 Container
-    await axios.delete(
-      containerInfo.meetingManagerDockerDomain + "/containers/" + containerId
-    );
-
-    // Return the meeting information
-    console.log(containerInfo.containerHostName + " 404 container deleted");
-    return { success: true };
-  } catch (e) {
-    console.log(e);
-    throw new Error("Error ending meeting, please try again.");
   }
 };
 

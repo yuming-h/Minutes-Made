@@ -17,7 +17,7 @@ import requests
 import numpy as np
 import config_mm404 as conf
 from collections import deque
-from flask import Flask, render_template, current_app, session, url_for
+from flask import Flask, jsonify, render_template, current_app, session, url_for
 from flask_socketio import SocketIO, emit
 from ltsd import LTSD_Detector
 from transcache import TransCacheReader
@@ -35,7 +35,7 @@ LTSD_CHUNK = int( CHUNK/2 )
 LTSD_ORDER = 5
 
 #### Other Constants
-FETCH_INTERVAL = 0.1
+FETCH_INTERVAL = 0.2  # Makes two redis calls per interval
 REDIS_JOB_QUEUE_KEY = 'job-queue'
 REDIS_WRITE_QUEUE_KEY = 'write-queue'
 
@@ -51,15 +51,25 @@ def index():
 
 @app.route('/finish-meeting')
 def finish_meeting():
-    """Performs the final actions to finish a meeting.
+    """Performs the final actions to finish a meeting:
     - Queue up the final ML job
     - Await the response
     - Write the response to DB
-    - Send the command to delete itself
+    - Flush redis DB
     - exit
     """
-    sys.exit(4)
-    return None
+    # Queue up the post meeting ML job
+    redis_payload = { "job_type": "postmeeting",
+        "job_data": {
+            "meeting_id": meeting_id,
+        }
+    }
+    redis_processing.lpush(REDIS_JOB_QUEUE_KEY, json.dumps(redis_payload))
+
+    # The end results are then awaited in the transcription sync thread,
+    # where the final actions are performed
+
+    return jsonify({"success": True})
 
 def start_meeting():
     """Preps MM404 to begin a meeting.
@@ -182,9 +192,10 @@ def write_speech_file(audio):
     return filename
 
 def transcript_sync_worker():
-    """Fetches the transcript from redis and performs routing.
+    """Fetches the transcript and other data from redis and performs routing.
     - Routes the transcript lines to db write
     - If action item, POSTs to MMIO
+    - Gets the post-meeting information and finishes the meeting
     """
     worker_transcript_reader = TransCacheReader(meeting_id, redis_processing)
 
@@ -203,7 +214,23 @@ def transcript_sync_worker():
             if transcript_line['action_item']:
                 print("ACTION ITEM!")
 
-        time.sleep(FETCH_INTERVAL)
+        time.sleep(FETCH_INTERVAL / 2)
+
+        # Get the potential post-meeting data back
+        post_meeting_data = worker_transcript_reader.read_post_meeting()
+        if post_meeting_data:
+            # Write the end results to the database
+            result = requests.post(conf.SUNNYD_DOMAIN+'/transcripts/add-tags', json={'meeting_id': meeting_id, 'data': post_meeting_data})
+            if result.status_code != 200:
+                print('Error sending post-meeting data to SunnyD: ', result.text)
+
+            # Flush the relevant redis DB keys
+            worker_transcript_reader.cleanup()
+
+            print("Meeting has ended, killing contianer")
+            sys.exit(4)
+
+        time.sleep(FETCH_INTERVAL / 2)
 
 @socketio.on('fetch-transcript')
 def fetch_transcript():

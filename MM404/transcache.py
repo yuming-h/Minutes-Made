@@ -29,3 +29,14 @@ class TransCacheReader():
         self.latest_idx = transcript_len
 
         return transcript_array
+
+    def read_post_meeting(self):
+        """Reads the post-meeting payload from the redis cache"""
+        postmeeting_bytes = self.redis.get(self.meeting_id+"-postmeeting")
+        return json.loads(postmeeting_bytes.decode("utf-8")) if postmeeting_bytes else None
+
+    def cleanup(self):
+        """Deletes the two redis keys from the database"""
+        print("Flushing REDIS transcription keys for meeting id", self.meeting_id)
+        self.redis.delete(self.meeting_id+"-postmeeting")
+        self.redis.delete(self.meeting_id)
