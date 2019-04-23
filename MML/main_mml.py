@@ -32,16 +32,9 @@ def translate_to_text(audio_fn):
 
     return text
 
-def process_from_redis(redisdb):
-    """Pops an audio ML job off of the queue and processes it"""
-    # Pop the data from the queue
-    audio_processing_job = redisdb.rpop(REDIS_JOB_QUEUE_KEY)
-    if not audio_processing_job:
-        time.sleep(FETCH_INTERVAL)
-        return
-
+def process_audio_job(redisdb, audio_processing_job):
+    """Performs the processing if the job is of audio type"""
     # Extract key information from the redis item
-    audio_processing_job = json.loads(audio_processing_job)
     local_fn = MEDIA_DIR + audio_processing_job['job_data']['filename']
     mm404_url = "http://mm404:5000" + audio_processing_job['job_data']['audio_uri']
 
@@ -68,6 +61,37 @@ def process_from_redis(redisdb):
     # Push back to redis
     if transcript_line:
         redisdb.rpush(audio_processing_job['job_data']['meeting_id'], json.dumps(redis_payload))
+
+def process_postmeeting_job(redisdb, postmeeting_processing_job):
+    """Performs the processing if the job is of postprocessing type"""
+    epoch_seconds = round(time.time())
+    redis_payload = {
+        "meeting_id": postmeeting_processing_job['job_data']['meeting_id'],
+        "timestamp": epoch_seconds,
+        "tags": [
+            "hello",
+            "tech",
+            "code",
+            "algorithms"
+        ]
+    }
+    redisdb.set(postmeeting_processing_job['job_data']['meeting_id']+"-postmeeting", json.dumps(redis_payload))
+
+def process_from_redis(redisdb):
+    """Pops an audio ML job off of the queue and processes it"""
+    # Pop the data from the queue
+    processing_job = redisdb.rpop(REDIS_JOB_QUEUE_KEY)
+    if not processing_job:
+        time.sleep(FETCH_INTERVAL)
+        return
+    processing_job = json.loads(processing_job)
+
+    # Perform the job by job type
+    if 'audio' in processing_job['job_type']:
+        process_audio_job(redisdb, processing_job)
+    elif 'postmeeting' in processing_job['job_type']:
+        process_postmeeting_job(redisdb, processing_job)
+
 
 def main():
     redisdb = redis.StrictRedis(host='redis-processing', port=6379, db=0)
