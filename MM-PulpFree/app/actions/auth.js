@@ -100,7 +100,7 @@ const login = async body => {
       const jwtOpts = {
         issuer: "Minutes Made",
         algorithm: "HS256",
-        expiresIn: "1d"
+        expiresIn: "7d"
       };
       // Unfortunately jwt doesn't support async/await so going to try this sync for now.
       return jwt.sign(jwtBody, conf.tokenSecret, jwtOpts);
