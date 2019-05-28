@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const routes = require("./routes");
+require("./middleware/passport");
 
 app.use(express.json());
 

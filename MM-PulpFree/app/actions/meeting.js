@@ -220,6 +220,5 @@ module.exports = {
   schedule,
   start,
   connect,
-  finish,
-  end
+  finish
 };
