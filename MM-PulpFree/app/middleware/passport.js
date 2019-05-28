@@ -12,7 +12,6 @@ const opts = {
 
 passport.use(
   new JwtStrategy(opts, (jwtPayload, done) => {
-    console.log("executing strategy: jwt:" + JSON.stringify(jwtPayload));
-    return done(null, "test");
+    return done(null, jwtPayload.userId);
   })
 );

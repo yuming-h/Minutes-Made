@@ -95,7 +95,7 @@ const login = async body => {
       });
 
       const jwtBody = {
-        userId: res.userId
+        userId: res.data.userId
       };
       const jwtOpts = {
         issuer: "Minutes Made",
