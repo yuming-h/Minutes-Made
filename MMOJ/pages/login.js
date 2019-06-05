@@ -31,14 +31,11 @@ export default class Login extends Component {
     event.preventDefault()
     const loginApi = this.props.apiUrl
 
-    Axios({
-      method: 'post',
-      url: loginApi,
-      headers: {'content-type': 'application/x-www-form-urlencoded'},
-      data: querystring.stringify({
+    Axios.post(session_url, {}, {
+      auth: {
         email: this.state.email,
-        pass: this.state.password
-      })
+        password: this.state.password
+      }
     })
     .then(function (response) {
       console.log(response);
