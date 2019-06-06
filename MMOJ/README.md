@@ -14,3 +14,13 @@ Maintainers:
 `npm run build` Build for production.
 
 `npm run export` Export static html from build. Shows up in `out` directory.
+
+## Quick Start Run Development Environment 
+
+1. `npm install`
+
+2. `npm run dev`
+
+3. `node start`
+
+Dev build loaded on localhost:3000
