@@ -37,7 +37,7 @@ High Level View of the Services we built:
 - Eye-Oh: Sends outbound requests to integrations.
 
 
-
+Rare insider photo of prototype diagram:
 ![diagram][logo]
 
 
