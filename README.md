@@ -27,14 +27,14 @@ Our team wanted to learn more about microservice architecture since it's somethi
 
 High Level View of the Services we built:
 
-- Orange-Juice: The frontend service built with Reactjs, focusing on ease of use.
-- Pulp-Free: Web-server with the main Client API. Outer layer connecting the Frontend to the rest of our services.
-- Four-Oh-Four: Handles the meeting logic. Spins up instances of meetings and kills them when necessary.
-- Emm-Ell: Handles biometrics, speech recognition.
-- Nginx: It's Nginx.
-- Kool-Aid: Relational database API. Reading/writing service.
-- Aye-Aye: Inbound-integration service. Receives and processes inbound requests from integrations like Slack and Jira. 
-- Eye-Oh: Sends outbound requests to integrations.
+- 🍊 Orange-Juice: The frontend service built with Reactjs, focusing on ease of use.
+- 🥤 Pulp-Free: Web-server with the main Client API. Outer layer connecting the Frontend to the rest of our services.
+- ❌ Four-Oh-Four: Handles the meeting logic. Spins up instances of meetings and kills them when necessary.
+- 🎛 Emm-Ell: Handles biometrics, speech recognition.
+- 📡 Nginx: It's Nginx.
+- 🍷 Kool-Aid: Relational database API. Reading/writing service.
+- 👁 Aye-Aye: Inbound-integration service. Receives and processes inbound requests from integrations like Slack and Jira. 
+- 👀 Eye-Oh: Sends outbound requests to integrations.
 
 
 Rare insider photo of prototype diagram at Minutes Made HQ:
