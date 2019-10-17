@@ -10,8 +10,8 @@ Read more at:  https://devpost.com/software/minutes-made
 
 ## Features
 
-- ⚛️ Reactjs Frontend UI designed with usability in mind.
 - 🎙️ Live transcriptions with speaker recognition and speech diarization Minutes Made recognizes your voice and tells it apart fromn your teammates.
+- ⚛️ Reactjs User Interface designed with usability in mind.
 - 📝 Keeps all your transcripts together so you can review meetings and keep track of what's important.
 - 🎬 Takes action. Integrations for Slack and Jira to update your team on what's important. Let Minutes Made know what needs to be done and it will keep everyone informed. 
 
